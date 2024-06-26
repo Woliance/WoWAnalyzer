@@ -661,6 +661,11 @@ const spells = {
     name: 'Divine Shield',
     icon: 'spell_holy_divineshield',
   },
+  EMPYREAN_HAMMER_DEBUFF: {
+    id: 431625,
+    name: 'Empyrean Hammer',
+    icon: 'ability_paladin_intercession',
+  },
 
   // T28
   ASHES_TO_ASHES: {

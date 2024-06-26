@@ -44,6 +44,7 @@ import EyeOfTyr from './modules/core/Defensives/EyeOfTyr';
 import ConsecrationDefensives from './modules/core/Defensives/ConsecrationDefensives';
 import Guide from './Guide';
 import DefensiveBuffs from './modules/core/Defensives/Defensivebuffs';
+import WrathfulDescent from './modules/talents/WrathfulDescent';
 
 class CombatLogParser extends CoreCombatLogParser {
   static guide = Guide;
@@ -95,6 +96,7 @@ class CombatLogParser extends CoreCombatLogParser {
     firstAvenger: FirstAvenger,
     momentOfGlory: MomentOfGlory,
     divineToll: DivineToll,
+    WrathfulDescent: WrathfulDescent,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }] as const,
