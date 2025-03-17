@@ -33,7 +33,6 @@ import RighteousProtector from './modules/talents/RighteousProtector';
 import ResoluteDefender from './modules/talents/ResoluteDefender';
 import GiftOfTheGoldenValkyr from './modules/talents/GiftOfTheGoldenValkyr';
 import SanctifiedWrathProtJudgement from './modules/talents/SanctifiedWrathProtJudgement';
-import ProtPaladinT304P from './modules/core/ProtPaladinT304P';
 import CastLinkNormalizer from './modules/CastLinkNormalizer';
 import GuardianOfAncientQueens from './normalizers/GuardianOfAncientQueens';
 import DefensiveBuffLinkNormalizer from './modules/core/Defensives/DefensiveBuffLinkNormalizer';
@@ -53,7 +52,6 @@ class CombatLogParser extends CoreCombatLogParser {
     builderUse: BuilderUse,
     grandCrusader: GrandCrusader,
     haste: Haste,
-    protPaladinT304P: ProtPaladinT304P,
 
     //Normalizers
     guardianOfAncientQueens: GuardianOfAncientQueens,

@@ -16,14 +16,11 @@ import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import MyAbilityNormalizer from '../CastLinkNormalizer';
 
 import Abilities from '../Abilities';
-import ProtPaladinT304P from '../core/ProtPaladinT304P';
-
 const BASE_PROC_CHANCE = 0.15;
 
 class GrandCrusader extends Analyzer {
   static dependencies = {
     abilities: Abilities,
-    protPaladinT304p: ProtPaladinT304P,
   };
   totalResets: number = 0;
   exactResets: number = 0;
@@ -31,7 +28,6 @@ class GrandCrusader extends Analyzer {
   gcProcs: number = 0;
   abilities!: Abilities;
   normalizer!: MyAbilityNormalizer;
-  protPaladinT304p!: ProtPaladinT304P;
 
   constructor(options: Options) {
     super(options);
@@ -85,7 +81,6 @@ class GrandCrusader extends Analyzer {
   }
 
   statistic() {
-    const gcJProcs = this.protPaladinT304p.gcJudgmentCrits;
     //As we use a different formula than the standard one for XAxis, we send it along as a parameter
     const binomChartXAxis = {
       title: 'Reset %',
@@ -100,7 +95,7 @@ class GrandCrusader extends Analyzer {
         size="flexible"
         tooltip={
           <>
-            Grand Crusader reset the cooldown of Avenger's Shield {this.gcProcs - gcJProcs} times.
+            Grand Crusader reset the cooldown of Avenger's Shield {this.gcProcs} times.
             <br />
             You had {this.resetChances} chances for Grand Crusader to trigger with a{' '}
             {formatPercentage(this.procChance, 0)}% chance to trigger.
@@ -109,7 +104,7 @@ class GrandCrusader extends Analyzer {
         dropdown={
           <div style={{ padding: '8px' }}>
             {plotOneVariableBinomChart(
-              this.gcProcs - gcJProcs,
+              this.gcProcs,
               this.resetChances,
               this.procChance,
               'Reset %',
@@ -125,7 +120,7 @@ class GrandCrusader extends Analyzer {
       >
         <BoringSpellValue
           spell={TALENTS.GRAND_CRUSADER_TALENT.id}
-          value={`${this.gcProcs - gcJProcs} Resets`}
+          value={`${this.gcProcs} Resets`}
           label="Grand Crusader"
         />
       </Statistic>
