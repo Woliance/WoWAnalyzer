@@ -45,7 +45,7 @@ const talents = {
   APOCALYPSE_NOW_TALENT: {
     id: 444040,
     name: 'Apocalypse Now',
-    icon: 'achievement_boss_fourhorsemen',
+    icon: 'inv_ability_rideroftheapocalypsedeathknight_apocalypsenow',
     maxRanks: 1,
     entryIds: [117638],
     definitionIds: [{ id: 122650, specId: 252 }],
@@ -142,6 +142,14 @@ const talents = {
     runesCost: 1,
     runicPowerCost: -10,
   },
+  BLOODIED_BLADE_TALENT: {
+    id: 458753,
+    name: 'Bloodied Blade',
+    icon: 'inv_sword_2h_ebonblade_b_01_red',
+    maxRanks: 1,
+    entryIds: [126296],
+    definitionIds: [{ id: 131122, specId: 250 }],
+  },
   BLOODSHOT_TALENT: {
     id: 391398,
     name: 'Bloodshot',
@@ -189,14 +197,6 @@ const talents = {
     maxRanks: 1,
     entryIds: [126298],
     definitionIds: [{ id: 131124, specId: 250 }],
-  },
-  BLOOD_FEVER_TALENT: {
-    id: 440002,
-    name: 'Blood Fever',
-    icon: 'ability_ironmaidens_corruptedblood',
-    maxRanks: 1,
-    entryIds: [117655],
-    definitionIds: [{ id: 122667, specId: 251 }],
   },
   BLOOD_SCENT_TALENT: {
     id: 374030,
@@ -253,7 +253,7 @@ const talents = {
     maxRanks: 1,
     entryIds: [96222],
     definitionIds: [{ id: 101224, specId: 251 }],
-    runicPowerCostPerSecond: 18,
+    runicPowerCostPerSecond: 17,
   },
   BRITTLE_TALENT: {
     id: 374504,
@@ -396,14 +396,6 @@ const talents = {
     maxRanks: 1,
     entryIds: [96324],
     definitionIds: [{ id: 101326, specId: 252 }],
-  },
-  DEATHS_BARGAIN_TALENT: {
-    id: 440476,
-    name: "Death's Bargain",
-    icon: 'ability_revendreth_deathknight',
-    maxRanks: 1,
-    entryIds: [117632],
-    definitionIds: [{ id: 122644, specId: 251 }],
   },
   DEATHS_ECHO_TALENT: {
     id: 356367,
@@ -557,8 +549,8 @@ const talents = {
     name: 'Expelling Shield',
     icon: 'spell_shadow_antimagicshell',
     maxRanks: 1,
-    entryIds: [119140],
-    definitionIds: [{ id: 124040, specId: 251 }],
+    entryIds: [128234],
+    definitionIds: [{ id: 133041, specId: 251 }],
   },
   EXTERMINATE_TALENT: {
     id: 441378,
@@ -1115,14 +1107,6 @@ const talents = {
     entryIds: [126016],
     definitionIds: [{ id: 130847, specId: 252 }],
   },
-  NYI_UNDER_CONSTRUCTION_TALENT: {
-    id: 458753,
-    name: '[NYI] Under Construction',
-    icon: 'achievement_bg_xkills_avgraveyard',
-    maxRanks: 1,
-    entryIds: [126296],
-    definitionIds: [{ id: 131122, specId: 250 }],
-  },
   OBLITERATE_TALENT: {
     id: 49020,
     name: 'Obliterate',
@@ -1180,6 +1164,14 @@ const talents = {
     entryIds: [123410],
     definitionIds: [{ id: 128248, specId: 252 }],
   },
+  PACT_OF_THE_DEATHBRINGER_TALENT: {
+    id: 440476,
+    name: 'Pact of the Deathbringer',
+    icon: 'ability_revendreth_deathknight',
+    maxRanks: 1,
+    entryIds: [117632],
+    definitionIds: [{ id: 122644, specId: 251 }],
+  },
   PACT_OF_THE_SANLAYN_TALENT: {
     id: 434261,
     name: "Pact of the San'layn",
@@ -1187,14 +1179,6 @@ const talents = {
     maxRanks: 1,
     entryIds: [117652],
     definitionIds: [{ id: 122664, specId: 252 }],
-  },
-  PAINFUL_DEATH_TALENT: {
-    id: 443564,
-    name: 'Painful Death',
-    icon: 'ability_domination_rune12',
-    maxRanks: 1,
-    entryIds: [123337],
-    definitionIds: [{ id: 128199, specId: 251 }],
   },
   PERMAFROST_TALENT: {
     id: 207200,
@@ -1275,6 +1259,8 @@ const talents = {
     maxRanks: 1,
     entryIds: [96287],
     definitionIds: [{ id: 101289, specId: 252 }],
+    runesCost: 1,
+    runicPowerCost: -10,
   },
   RAISE_DEAD_SHARED_TALENT: {
     id: 46585,
@@ -1308,6 +1294,22 @@ const talents = {
     entryIds: [117659],
     definitionIds: [{ id: 122671, specId: 251 }],
     runesCost: 2,
+  },
+  REAPERS_ONSLAUGHT_TALENT: {
+    id: 469870,
+    name: "Reaper's Onslaught",
+    icon: 'ability_demonhunter_soulcleave2',
+    maxRanks: 1,
+    entryIds: [128266],
+    definitionIds: [{ id: 133073, specId: 251 }],
+  },
+  REAPER_OF_SOULS_TALENT: {
+    id: 440002,
+    name: 'Reaper of Souls',
+    icon: 'pvp_soulrip',
+    maxRanks: 1,
+    entryIds: [128235],
+    definitionIds: [{ id: 133042, specId: 251 }],
   },
   REAPING_TALENT: {
     id: 377514,
@@ -1548,9 +1550,9 @@ const talents = {
     entryIds: [96216],
     definitionIds: [{ id: 101218, specId: 252 }],
   },
-  SWIFT_END_TALENT: {
+  SWIFT_AND_PAINFUL_TALENT: {
     id: 443560,
-    name: 'Swift End',
+    name: 'Swift and Painful',
     icon: 'ability_domination_rune02',
     maxRanks: 1,
     entryIds: [117629],
@@ -1621,14 +1623,12 @@ const talents = {
     definitionIds: [{ id: 101286, specId: 252 }],
   },
   UNHOLY_BLIGHT_TALENT: {
-    id: 115989,
+    id: 460448,
     name: 'Unholy Blight',
     icon: 'spell_shadow_contagion',
     maxRanks: 1,
     entryIds: [96297],
     definitionIds: [{ id: 101299, specId: 252 }],
-    runicPowerCost: -10,
-    runesCost: 1,
   },
   UNHOLY_BOND_TALENT: {
     id: 374261,
@@ -1735,9 +1735,9 @@ const talents = {
     definitionIds: [{ id: 101295, specId: 252 }],
     runicPowerCost: 30,
   },
-  VISCERAL_REGENERATION_TALENT: {
+  VISCERAL_STRENGTH_TALENT: {
     id: 434157,
-    name: 'Visceral Regeneration',
+    name: 'Visceral Strength',
     icon: 'inv_ragnaros_heart',
     maxRanks: 1,
     entryIds: [117642],
@@ -1780,8 +1780,8 @@ const talents = {
     name: 'Wither Away',
     icon: 'sha_spell_warlock_demonsoul',
     maxRanks: 1,
-    entryIds: [121984],
-    definitionIds: [{ id: 126884, specId: 251 }],
+    entryIds: [117655],
+    definitionIds: [{ id: 122667, specId: 251 }],
   },
   WRAITH_WALK_TALENT: {
     id: 212552,

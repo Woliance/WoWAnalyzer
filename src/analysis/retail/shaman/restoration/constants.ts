@@ -19,8 +19,14 @@ export const CHAIN_HEAL_GROUPING = 'ChainHealGrouping';
 export const FLOW_OF_THE_TIDES = 'FlowOfTheTides';
 export const DOWNPOUR = 'Downpour';
 export const HIGH_TIDE = 'HighTide';
+export const LIVELY_TOTEMS_CHAIN_HEAL = 'LivelyTotemsChainHeal';
+export const REACTIVITY = 'Reactivity';
 //event link ms settings
 export const CAST_BUFFER_MS = 100;
+// 50 was too low, 100 was too high
+// had no issues with 85ms
+export const SURGING_TOTEM_BUFFER_MS = 85;
+
 export const PWAVE_TRAVEL_MS = 1100;
 export const UNLEASH_LIFE_REMOVE_MS = 400;
 //healing increases
@@ -28,15 +34,25 @@ export const UNLEASH_LIFE_HEALING_INCREASE = 0.35;
 export const UNLEASH_LIFE_CHAIN_HEAL_INCREASE = 0.15;
 export const FLOW_OF_THE_TIDES_INCREASE = 0.3;
 export const ANCESTRAL_REACH_INCREASE = 0.08;
+//max HP increases
+export const ANCESTRAL_VIGOR_INCREASED_MAX_HEALTH = 0.1;
+export const DOWNPOUR_INCREASED_MAX_HEALTH = 0.1;
 
 //base targets & target increases
 export const UNLEASH_LIFE_EXTRA_TARGETS = 2;
-export const HEALING_RAIN_TARGETS = 6;
-export const DOWNPOUR_TARGETS = 6;
-export const DOWNPOUR_CD_PER_HIT = 5000;
+export const HEALING_RAIN_TARGETS = 5;
+export const DOWNPOUR_TARGETS = 5;
 export const CHAIN_HEAL_TARGETS = 4;
 export const ANCESTRAL_REACH_TARGET = 1;
 export const FLOW_OF_THE_TIDES_TARGET = 1;
+
+//mana saves
+export const SPIRITWALKERS_TIDAL_TOTEM_REDUCTION = 0.5;
+
+//whirling elements
+export const WHIRLINGAIR_HEAL = 'WhirlingAirHeal';
+export const WHIRLINGEARTH_HEAL = 'WhirlingEarthHeal';
+export const WHIRLINGWATER_HEAL = 'WhirlingWaterHeal';
 
 export const RESTORATION_COLORS = {
   CHAIN_HEAL: '#203755',
@@ -62,7 +78,7 @@ export const HIGH_TIDE_COEFFICIENT = 2.541;
 const SHAMAN_BASE_ABILITIES = [
   SPELLS.HEALING_SURGE,
   SPELLS.PRIMORDIAL_WAVE_HEAL,
-  TALENTS.HEALING_WAVE_TALENT,
+  SPELLS.HEALING_WAVE,
   TALENTS.CHAIN_HEAL_TALENT,
   SPELLS.HEALING_SURGE,
   TALENTS.RIPTIDE_TALENT,
@@ -87,7 +103,6 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
 
   // While the following spells don't double dip in healing increases, they gain the same percentual bonus from the transfer
   SPELLS.ANCESTRAL_AWAKENING_HEAL, // double check interactions
-  SPELLS.ANCESTRAL_GUIDANCE_HEAL,
   SPELLS.CLOUDBURST_TOTEM_HEAL,
   SPELLS.ASCENDANCE_HEAL,
   SPELLS.LEECH,
@@ -102,7 +117,6 @@ export const ABILITIES_AFFECTED_BY_MASTERY = [
   ...BASE_ABILITIES_AFFECTED_BY_MASTERY,
   // While the following spells don't double dip in healing increases, they gain the same percentual bonus from the transfer
   SPELLS.ANCESTRAL_AWAKENING_HEAL,
-  SPELLS.ANCESTRAL_GUIDANCE_HEAL,
   SPELLS.CLOUDBURST_TOTEM_HEAL,
   SPELLS.ASCENDANCE_HEAL,
   SPELLS.LEECH,
@@ -113,3 +127,10 @@ export const FLASH_FLOOD_CAST_SPEED_MODIFIER = 0.1; // per rank
 export const HEALING_RAIN_DURATION = 10000;
 export const RIPTIDE_BASE_DURATION = 18000;
 export const WAVESPEAKERS_BLESSING = 3000;
+export const SURGING_TOTEM_DURATION = 24000;
+
+export const WHIRLING_ELEMENTS_MOTES = [
+  SPELLS.WHIRLING_AIR,
+  SPELLS.WHIRLING_EARTH,
+  SPELLS.WHIRLING_WATER,
+];

@@ -18,7 +18,6 @@ class PsychicLink extends Analyzer {
   //damage of Psychic Link by the spell that caused it
   damageMB = 0;
   damageSWD = 0;
-  damageMG = 0;
   damageDP = 0;
   damageMS = 0;
   damageMSI = 0;
@@ -36,10 +35,6 @@ class PsychicLink extends Analyzer {
     this.addEventListener(Events.damage.by(SELECTED_PLAYER).spell(SPELLS.MIND_BLAST), this.onSpell);
     this.addEventListener(
       Events.damage.by(SELECTED_PLAYER).spell(TALENTS.SHADOW_WORD_DEATH_TALENT),
-      this.onSpell,
-    );
-    this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(TALENTS.MINDGAMES_TALENT),
       this.onSpell,
     );
     this.addEventListener(
@@ -76,39 +71,36 @@ class PsychicLink extends Analyzer {
   }
 
   onLink(event: DamageEvent) {
-    this.damageTotal += event.amount;
+    this.damageTotal += event.amount + (event.absorbed || 0);
     this.totalHits += 1;
 
     switch (this.recentSpell) {
       case SPELLS.MIND_BLAST.name:
-        this.damageMB += event.amount;
+        this.damageMB += event.amount + (event.absorbed || 0);
         break;
       case TALENTS.SHADOW_WORD_DEATH_TALENT.name:
-        this.damageSWD += event.amount;
-        break;
-      case TALENTS.MINDGAMES_TALENT.name:
-        this.damageMG += event.amount;
+        this.damageSWD += event.amount + (event.absorbed || 0);
         break;
       case TALENTS.DEVOURING_PLAGUE_TALENT.name:
-        this.damageDP += event.amount;
+        this.damageDP += event.amount + (event.absorbed || 0);
         break;
       case TALENTS.MIND_SPIKE_TALENT.name:
-        this.damageMS += event.amount;
+        this.damageMS += event.amount + (event.absorbed || 0);
         break;
       case SPELLS.MIND_SPIKE_INSANITY_TALENT_DAMAGE.name:
-        this.damageMSI += event.amount;
+        this.damageMSI += event.amount + (event.absorbed || 0);
         break;
       case SPELLS.MIND_FLAY.name:
-        this.damageMF += event.amount;
+        this.damageMF += event.amount + (event.absorbed || 0);
         break;
       case SPELLS.MIND_FLAY_INSANITY_TALENT_DAMAGE.name:
-        this.damageMFI += event.amount;
+        this.damageMFI += event.amount + (event.absorbed || 0);
         break;
       case TALENTS.VOID_TORRENT_TALENT.name:
-        this.damageVT += event.amount;
+        this.damageVT += event.amount + (event.absorbed || 0);
         break;
       case SPELLS.VOID_BOLT.name:
-        this.damageVB += event.amount;
+        this.damageVB += event.amount + (event.absorbed || 0);
         break;
       default:
         break;
@@ -120,7 +112,7 @@ class PsychicLink extends Analyzer {
       <Statistic
         category={STATISTIC_CATEGORY.TALENTS}
         size="flexible"
-        tooltip="Contrubution by each spell"
+        tooltip="Contribution by each spell"
       >
         <BoringSpellValueText spell={TALENTS.PSYCHIC_LINK_TALENT}>
           <ItemDamageDone amount={this.damageTotal} />
@@ -179,13 +171,6 @@ class PsychicLink extends Analyzer {
               <div>
                 <SpellLink spell={TALENTS.VOID_TORRENT_TALENT} />:{' '}
                 {formatPercentage(this.damageVT / this.damageTotal, 1)}%
-              </div>
-            ) : null}
-
-            {this.selectedCombatant.hasTalent(TALENTS.MINDGAMES_TALENT) ? (
-              <div>
-                <SpellLink spell={TALENTS.MINDGAMES_TALENT} />:{' '}
-                {formatPercentage(this.damageMG / this.damageTotal, 1)}%
               </div>
             ) : null}
           </small>

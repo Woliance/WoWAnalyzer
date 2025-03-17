@@ -4,7 +4,9 @@ import Events, {
   AnyEvent,
   ApplyBuffEvent,
   CastEvent,
+  DamageEvent,
   EmpowerEndEvent,
+  GetRelatedEvents,
   RefreshBuffEvent,
   RemoveBuffEvent,
 } from 'parser/core/Events';
@@ -17,6 +19,10 @@ import {
   BREATH_OF_EONS_EXTENSION_MS,
   SANDS_OF_TIME_CRIT_MOD,
   DREAM_OF_SPRINGS_EXTENSION_MS,
+  BREATH_OF_EONS_SPELL_IDS,
+  BREATH_OF_EONS_SPELLS,
+  EBON_MIGHT_PERSONAL_DAMAGE_AMP,
+  CLOSE_AS_CLUTCHMATES_MOD,
 } from 'analysis/retail/evoker/augmentation/constants';
 import StatTracker from 'parser/shared/modules/StatTracker';
 import { ChecklistUsageInfo, SpellUse } from 'parser/core/SpellUsage/core';
@@ -30,7 +36,18 @@ import Combatants from 'parser/shared/modules/Combatants';
 import classColor from 'game/classColor';
 import SPECS from 'game/SPECS';
 import ROLES from 'game/ROLES';
-import { TIERS } from 'game/TIERS';
+import { isMythicPlus } from 'common/isMythicPlus';
+import Statistic from 'parser/ui/Statistic';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
+import TalentSpellText from 'parser/ui/TalentSpellText';
+import DonutChart from 'parser/ui/DonutChart';
+import ItemDamageDone from 'parser/ui/ItemDamageDone';
+import { formatNumber } from 'common/format';
+import { calculateEffectiveDamage } from 'parser/core/EventCalculateLib';
+import { UPHEAVAL_REVERBERATION_DAM_LINK } from '../normalizers/CastLinkNormalizer';
+import { InformationIcon } from 'interface/icons';
+import { formatPercentage } from 'common/format';
 
 const PANDEMIC_WINDOW = 0.3;
 
@@ -71,16 +88,35 @@ class EbonMight extends Analyzer {
   private ebonMightCasts: EbonMightCooldownCast[] = [];
   private prescienceCasts: PrescienceBuffs[] = [];
 
+  private personalDamageAmp = isMythicPlus(this.owner.fight)
+    ? EBON_MIGHT_PERSONAL_DAMAGE_AMP * CLOSE_AS_CLUTCHMATES_MOD
+    : EBON_MIGHT_PERSONAL_DAMAGE_AMP;
+
   ebonMightActive: boolean = false;
   currentEbonMightDuration: number = 0;
   currentEbonMightCastTime: number = 0;
 
+  personalEbonMightDamage = 0;
+  externalEbonMightDamage = 0;
+
   trackedSpells = [
     TALENTS.ERUPTION_TALENT,
-    TALENTS.BREATH_OF_EONS_TALENT,
+    ...BREATH_OF_EONS_SPELLS,
+    SPELLS.BREATH_OF_EONS_SCALECOMMANDER,
     SPELLS.EMERALD_BLOSSOM_CAST,
   ];
   empowers = [SPELLS.FIRE_BREATH, SPELLS.FIRE_BREATH_FONT, SPELLS.UPHEAVAL, SPELLS.UPHEAVAL_FONT];
+  personalBuffedSpells = [
+    SPELLS.DEEP_BREATH_DAM,
+    SPELLS.FIRE_BREATH_DOT,
+    SPELLS.LIVING_FLAME_DAMAGE,
+    SPELLS.AZURE_STRIKE,
+    SPELLS.UNRAVEL,
+    TALENTS.ERUPTION_TALENT,
+    SPELLS.UPHEAVAL_DAM,
+    SPELLS.MASS_ERUPTION_DAMAGE,
+    SPELLS.MELT_ARMOR,
+  ];
 
   constructor(options: Options) {
     super(options);
@@ -108,6 +144,23 @@ class EbonMight extends Analyzer {
     this.addEventListener(
       Events.removebuff.by(SELECTED_PLAYER).spell(SPELLS.PRESCIENCE_BUFF),
       this.onPrescienceRemove,
+    );
+
+    this.addEventListener(
+      Events.damage.by(SELECTED_PLAYER).spell(this.personalBuffedSpells),
+      this.onPersonalDamage,
+    );
+
+    if (this.selectedCombatant.hasTalent(TALENTS.REVERBERATIONS_TALENT)) {
+      this.addEventListener(
+        Events.empowerEnd.by(SELECTED_PLAYER).spell([SPELLS.UPHEAVAL, SPELLS.UPHEAVAL_FONT]),
+        this.addReverberationsDamage,
+      );
+    }
+
+    this.addEventListener(
+      Events.damage.by(SELECTED_PLAYER).spell(SPELLS.EBON_MIGHT_BUFF_EXTERNAL),
+      this.onExternalDamage,
     );
 
     this.addEventListener(Events.fightend, this.finalize);
@@ -167,6 +220,29 @@ class EbonMight extends Analyzer {
     this.extendEbonMight(event);
   }
 
+  private onPersonalDamage(event: DamageEvent) {
+    if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
+      this.personalEbonMightDamage += calculateEffectiveDamage(event, this.personalDamageAmp);
+    }
+  }
+
+  private addReverberationsDamage(event: EmpowerEndEvent) {
+    if (this.selectedCombatant.hasBuff(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id)) {
+      const reverbEvents = GetRelatedEvents<DamageEvent>(event, UPHEAVAL_REVERBERATION_DAM_LINK);
+
+      reverbEvents.forEach((reverbEvent) => {
+        this.personalEbonMightDamage += calculateEffectiveDamage(
+          reverbEvent,
+          this.personalDamageAmp,
+        );
+      });
+    }
+  }
+
+  private onExternalDamage(event: DamageEvent) {
+    this.externalEbonMightDamage += event.amount;
+  }
+
   /* Here we figure out how long the duration should be based on current mastery
    * as well pandemiccing the current buff if we are refreshing */
   private calculateEbonMightDuration(event: AnyEvent) {
@@ -202,7 +278,7 @@ class EbonMight extends Analyzer {
 
     let newEbonMightDuration;
 
-    if (event.ability.guid === TALENTS.BREATH_OF_EONS_TALENT.id) {
+    if (BREATH_OF_EONS_SPELL_IDS.includes(event.ability.guid)) {
       newEbonMightDuration = ebonMightTimeLeft + BREATH_OF_EONS_EXTENSION_MS * critMod;
     } else if (event.ability.guid === TALENTS.ERUPTION_TALENT.id) {
       newEbonMightDuration = ebonMightTimeLeft + ERUPTION_EXTENSION_MS * critMod;
@@ -289,21 +365,13 @@ class EbonMight extends Analyzer {
       EBON_MIGHT_BASE_DURATION_MS *
       (1 + TIMEWALKER_BASE_EXTENSION + ebonMightCooldownCast.currentMastery) *
       PANDEMIC_WINDOW;
-    const hasT31 =
-      this.selectedCombatant.has2PieceByTier(TIERS.DF3) ||
-      this.selectedCombatant.has2PieceByTier(TIERS.DF4);
 
     let performance;
     let summary;
     let details;
     let prescienceBuffsActive = 0;
 
-    /** We can only ever start the fight with 2 Prescience with current design, so don't bonk that on pull */
-    const isPullPrescience =
-      ebonMightCooldownCast.event.timestamp >= this.owner.fight.start_time + 10_000;
-
-    const PERFECT_PRESCIENCE_BUFFS = hasT31 && isPullPrescience ? 3 : 2;
-    const GOOD_PRESCIENCE_BUFFS = 2;
+    const PERFECT_PRESCIENCE_BUFFS = 2;
     const OK_PRESCIENCE_BUFFS = 1;
 
     prescienceCasts.forEach((event) => {
@@ -358,22 +426,13 @@ class EbonMight extends Analyzer {
             on cast. Good job!
           </div>
         );
-      } else if (prescienceBuffsActive === GOOD_PRESCIENCE_BUFFS && hasT31) {
-        performance = QualitativePerformance.Good;
-        details = (
-          <div>
-            You had {prescienceBuffsActive} <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active
-            on cast. Since you have <b>T31 2pc</b> you should always aim to have 3 active, so you
-            can better control who your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> goes on.
-          </div>
-        );
       } else if (prescienceBuffsActive === OK_PRESCIENCE_BUFFS) {
         performance = QualitativePerformance.Ok;
         details = (
           <div>
             You had {prescienceBuffsActive} <SpellLink spell={TALENTS.PRESCIENCE_TALENT} /> active
-            on cast. Try to line it up so you have {hasT31 && 'atleast '} 2 active, so you can
-            better control who your <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> goes on.
+            on cast. Try to line it up so you have 2 active, so you can better control who your{' '}
+            <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> goes on.
           </div>
         );
       } else {
@@ -477,7 +536,7 @@ class EbonMight extends Analyzer {
   }
 
   guideSubsection(): JSX.Element | null {
-    if (!this.active) {
+    if (!this.active || isMythicPlus(this.owner.fight)) {
       return null;
     }
 
@@ -486,7 +545,7 @@ class EbonMight extends Analyzer {
         <strong>
           <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} />
         </strong>{' '}
-        Is one of the most important spells in your entire kit. It provides 4 allies with a
+        is one of the most important spells in your entire kit. It provides 4 allies with a
         percentage of your mainstat, along with making them priority targets for{' '}
         <SpellLink spell={SPELLS.SHIFTING_SANDS_BUFF} />.{' '}
         <SpellLink spell={TALENTS.EBON_MIGHT_TALENT} /> prefers targets with{' '}
@@ -508,6 +567,44 @@ class EbonMight extends Analyzer {
         }
         abovePerformanceDetails={<div style={{ marginBottom: 10 }}></div>}
       />
+    );
+  }
+
+  statistic() {
+    const buffUptime =
+      this.selectedCombatant.getBuffUptime(SPELLS.EBON_MIGHT_BUFF_PERSONAL.id) /
+      this.owner.fightDuration;
+    const damageSources = [
+      {
+        color: 'rgb(212, 81, 19)',
+        label: 'External',
+        spellId: SPELLS.EBON_MIGHT_BUFF_EXTERNAL.id,
+        valueTooltip: formatNumber(this.externalEbonMightDamage),
+        value: this.externalEbonMightDamage,
+      },
+      {
+        color: 'rgb(51, 147, 127)',
+        label: 'Personal',
+        spellId: SPELLS.EBON_MIGHT_BUFF_PERSONAL.id,
+        valueTooltip: formatNumber(this.personalEbonMightDamage),
+        value: this.personalEbonMightDamage,
+      },
+    ];
+    return (
+      <Statistic
+        position={STATISTIC_ORDER.CORE(0)}
+        size="flexible"
+        category={STATISTIC_CATEGORY.TALENTS}
+      >
+        <TalentSpellText talent={TALENTS.EBON_MIGHT_TALENT}>
+          <InformationIcon /> {formatPercentage(buffUptime, 2)}%<small> buff uptime</small>
+          <br />
+          <ItemDamageDone amount={this.personalEbonMightDamage + this.externalEbonMightDamage} />
+        </TalentSpellText>
+        <div className="pad">
+          <DonutChart items={damageSources} />
+        </div>
+      </Statistic>
     );
   }
 }

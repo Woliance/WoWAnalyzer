@@ -12,11 +12,9 @@ const defensiveTalents: Cooldown[] = [
   },
   {
     spell: TALENTS.NATURES_SWIFTNESS_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.NATURES_SWIFTNESS_TALENT),
-  },
-  {
-    spell: TALENTS.ANCESTRAL_GUIDANCE_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.ANCESTRAL_GUIDANCE_TALENT),
+    isActive: (c) =>
+      c.hasTalent(TALENTS.NATURES_SWIFTNESS_TALENT) &&
+      !c.hasTalent(TALENTS.ANCESTRAL_SWIFTNESS_TALENT),
   },
   {
     spell: TALENTS.EARTHEN_WALL_TOTEM_TALENT,
@@ -25,6 +23,10 @@ const defensiveTalents: Cooldown[] = [
   {
     spell: TALENTS.SPIRITWALKERS_GRACE_TALENT,
     isActive: (c) => c.hasTalent(TALENTS.SPIRITWALKERS_GRACE_TALENT),
+  },
+  {
+    spell: TALENTS.STONE_BULWARK_TOTEM_TALENT,
+    isActive: (c) => c.hasTalent(TALENTS.STONE_BULWARK_TOTEM_TALENT),
   },
 ];
 

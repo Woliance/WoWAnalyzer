@@ -1,7 +1,15 @@
 import SPELLS from 'common/SPELLS';
 import { TALENTS_EVOKER } from 'common/TALENTS';
 import { EventLink } from 'parser/core/EventLinkNormalizer';
-import { EventType, ApplyBuffEvent, HealEvent, HasRelatedEvent } from 'parser/core/Events';
+import {
+  EventType,
+  ApplyBuffEvent,
+  HealEvent,
+  HasRelatedEvent,
+  ApplyDebuffEvent,
+  RefreshDebuffEvent,
+  DamageEvent,
+} from 'parser/core/Events';
 import { DUPLICATION_SPELLS } from '../../constants';
 import {
   LIFEBIND,
@@ -14,6 +22,17 @@ import {
   LIFESPARK_LIVING_FLAME,
   LIVING_FLAME_FLIGHT_TIME,
   LIVING_FLAME_CALL_OF_YSERA,
+  FIRE_BREATH,
+  FIRE_BREATH_CAST,
+  MAX_FIRE_BREATH_DURATION,
+  ENGULF_DREAM_BREATH,
+  MAX_DREAM_BREATH_DURATION,
+  ENGULF_CONSUME_FLAME,
+  ENGULF_CONSUME_BUFFER,
+  LIFEBIND_HEAL_EMPOWER,
+  LIFEBIND_ALL_HEALING,
+  LIFEBIND_DURATION,
+  LIFEBIND_BATCHING,
 } from './constants';
 
 export const RED_EVENT_LINKS: EventLink[] = [
@@ -57,6 +76,27 @@ export const RED_EVENT_LINKS: EventLink[] = [
     additionalCondition(linkingEvent, referencedEvent) {
       return HasRelatedEvent(linkingEvent, LIFEBIND); // make sure the heal is on someone with lifebind buff
     },
+  },
+  {
+    linkRelation: LIFEBIND_HEAL_EMPOWER,
+    reverseLinkRelation: LIFEBIND_HEAL_EMPOWER,
+    linkingEventId: SPELLS.LIFEBIND_HEAL.id,
+    linkingEventType: EventType.Heal,
+    referencedEventId: [SPELLS.SPIRITBLOOM.id, SPELLS.SPIRITBLOOM_FONT.id],
+    referencedEventType: EventType.Heal,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+  },
+  {
+    linkRelation: LIFEBIND_ALL_HEALING,
+    linkingEventId: SPELLS.LIFEBIND_BUFF.id,
+    linkingEventType: EventType.ApplyBuff,
+    referencedEventId: SPELLS.LIFEBIND_HEAL.id,
+    referencedEventType: EventType.Heal,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: LIFEBIND_DURATION + LIFEBIND_BATCHING,
+    anyTarget: true,
   },
   {
     linkRelation: ANCIENT_FLAME,
@@ -107,6 +147,60 @@ export const RED_EVENT_LINKS: EventLink[] = [
     anyTarget: true,
     isActive(c) {
       return c.hasTalent(TALENTS_EVOKER.CALL_OF_YSERA_TALENT);
+    },
+  },
+  //Fire Breath
+  {
+    linkRelation: FIRE_BREATH,
+    linkingEventId: SPELLS.FIRE_BREATH_DOT.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.FIRE_BREATH_DOT.id,
+    referencedEventType: [EventType.RefreshDebuff, EventType.ApplyDebuff],
+    reverseLinkRelation: FIRE_BREATH,
+    backwardBufferMs: MAX_FIRE_BREATH_DURATION,
+    additionalCondition(linkingEvent, referencedEvent) {
+      const linkDamageEvent = linkingEvent as DamageEvent;
+      const refDebuffEvent =
+        referencedEvent.type === EventType.RefreshDebuff
+          ? (referencedEvent as RefreshDebuffEvent)
+          : (referencedEvent as ApplyDebuffEvent);
+      return (
+        linkDamageEvent.ability.guid === refDebuffEvent.ability.guid &&
+        !HasRelatedEvent(linkingEvent, FIRE_BREATH)
+      );
+    },
+  },
+  {
+    linkRelation: FIRE_BREATH_CAST,
+    linkingEventId: SPELLS.FIRE_BREATH_DOT.id,
+    linkingEventType: [EventType.RefreshDebuff, EventType.ApplyDebuff],
+    referencedEventId: [SPELLS.FIRE_BREATH.id, SPELLS.FIRE_BREATH_FONT.id],
+    referencedEventType: EventType.EmpowerEnd,
+    backwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+  },
+  //Engulf
+  {
+    linkRelation: ENGULF_DREAM_BREATH,
+    linkingEventId: SPELLS.ENGULF_HEAL.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: [SPELLS.DREAM_BREATH.id, SPELLS.DREAM_BREATH_FONT.id],
+    referencedEventType: [EventType.ApplyBuff, EventType.RefreshBuff],
+    backwardBufferMs: MAX_DREAM_BREATH_DURATION,
+    maximumLinks: 1,
+  },
+  {
+    linkRelation: ENGULF_CONSUME_FLAME,
+    linkingEventId: TALENTS_EVOKER.ENGULF_TALENT.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.CONSUME_FLAME_HEAL.id,
+    referencedEventType: EventType.Heal,
+    forwardBufferMs: ENGULF_CONSUME_BUFFER,
+    backwardBufferMs: ENGULF_CONSUME_BUFFER,
+    reverseLinkRelation: ENGULF_CONSUME_FLAME,
+    anyTarget: true,
+    additionalCondition(linkingEvent, referencedEvent) {
+      return !HasRelatedEvent(referencedEvent, ENGULF_CONSUME_FLAME);
     },
   },
 ];

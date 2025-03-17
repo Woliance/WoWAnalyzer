@@ -35,11 +35,11 @@ class Thunderlord extends Analyzer {
     }
 
     this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.THUNDER_CLAP_PROTECTION_TALENT),
+      Events.cast.by(SELECTED_PLAYER).spell(TALENTS.THUNDER_CLAP_TALENT),
       this.onCast,
     );
     this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(TALENTS.THUNDER_CLAP_PROTECTION_TALENT),
+      Events.damage.by(SELECTED_PLAYER).spell(TALENTS.THUNDER_CLAP_TALENT),
       this.reduce,
     );
   }
@@ -69,7 +69,7 @@ class Thunderlord extends Analyzer {
       <Statistic
         position={STATISTIC_ORDER.OPTIONAL(13)}
         size="flexible"
-        category={STATISTIC_CATEGORY.COVENANTS}
+        category={STATISTIC_CATEGORY.TALENTS}
         tooltip={<>Wasted CDR: {formatDuration(this.wastedCDR)}</>}
       >
         <BoringSpellValueText spell={TALENTS.THUNDERLORD_TALENT}>

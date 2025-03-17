@@ -3,6 +3,7 @@ import Spell from 'common/SPELLS/Spell';
 import Combatant from 'parser/core/Combatant';
 import { TALENTS_DRUID } from 'common/TALENTS';
 
+// TODO TWW - actually hook this in?
 export const WHITELIST_ABILITIES = [
   SPELLS.STARSURGE_MOONKIN,
   SPELLS.STARSURGE_AFFINITY,
@@ -32,24 +33,52 @@ export function cdSpell(c: Combatant): Spell {
       : SPELLS.CELESTIAL_ALIGNMENT;
 }
 
-const CA_DURATION = 20_000;
-const INCARN_DURATION = 30_000;
+const CA_DURATION = 15_000;
+const INCARN_DURATION = 20_000;
+const WHIRLING_STARS_MULT = 0.8;
 /** Returns the duration of Balance Druid's primary cooldown spell, which changes based on talent */
 export function cdDuration(c: Combatant): number {
-  return c.hasTalent(TALENTS_DRUID.INCARNATION_CHOSEN_OF_ELUNE_TALENT)
+  const baseDuration = c.hasTalent(TALENTS_DRUID.INCARNATION_CHOSEN_OF_ELUNE_TALENT)
     ? INCARN_DURATION
     : CA_DURATION;
+  return (
+    baseDuration * (c.hasTalent(TALENTS_DRUID.WHIRLING_STARS_TALENT) ? WHIRLING_STARS_MULT : 1)
+  );
+}
+
+const BASE_CD = 180;
+const ORBITAL_STRIKE_CD = 120;
+const WHIRLING_STARS_CD = 100;
+/** Returns the cooldown of Balance Druid's primary cooldown spell, which changes based on talent */
+export function cdCooldown(c: Combatant): number {
+  if (c.hasTalent(TALENTS_DRUID.ORBITAL_STRIKE_TALENT)) {
+    return ORBITAL_STRIKE_CD;
+  } else if (c.hasTalent(TALENTS_DRUID.WHIRLING_STARS_TALENT)) {
+    return WHIRLING_STARS_CD;
+  } else {
+    return BASE_CD;
+  }
+}
+
+/** Helper for checking if player has solar eclipse */
+export function hasSolar(c: Combatant): boolean {
+  return c.hasBuff(SPELLS.ECLIPSE_SOLAR.id);
+}
+
+/** Helper for checking if player has lunar eclipse */
+export function hasLunar(c: Combatant): boolean {
+  return c.hasBuff(SPELLS.ECLIPSE_LUNAR.id);
 }
 
 /** Helper for figuring out the current eclipse state */
 export function currentEclipse(c: Combatant): 'none' | 'solar' | 'lunar' | 'both' {
-  const hasSolar = c.hasBuff(SPELLS.ECLIPSE_SOLAR.id);
-  const hasLunar = c.hasBuff(SPELLS.ECLIPSE_LUNAR.id);
-  if (hasSolar && hasLunar) {
+  const solar = hasSolar(c);
+  const lunar = hasLunar(c);
+  if (solar && lunar) {
     return 'both';
-  } else if (hasSolar) {
+  } else if (solar) {
     return 'solar';
-  } else if (hasLunar) {
+  } else if (lunar) {
     return 'lunar';
   } else {
     return 'none';

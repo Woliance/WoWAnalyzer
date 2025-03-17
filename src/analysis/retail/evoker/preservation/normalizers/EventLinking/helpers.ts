@@ -23,7 +23,6 @@ import {
   LIVING_FLAME_CALL_OF_YSERA,
   DREAM_BREATH_CALL_OF_YSERA_HOT,
   FIELD_OF_DREAMS_PROC,
-  ESSENCE_BURST_CONSUME,
   LIFEBIND_HEAL,
   ECHO_TYPE,
   LIFEBIND,
@@ -41,11 +40,15 @@ import {
   EB_REVERSION,
   TIME_OF_NEED_HEALING,
   LIFESPARK_LIVING_FLAME,
-  T32_2PC,
   REVERSION,
-  T32_4PC,
   EMERALD_BLOSSOM_CAST,
   DREAM_BREATH,
+  DREAM_BREATH_CAST,
+  DREAM_BREATH_FROM_STASIS,
+  STASIS_FILLING,
+  ENGULF_CONSUME_FLAME,
+  VERDANT_EMBRACE_INSURANCE,
+  INSURANCE_APPLICATION,
 } from './constants';
 
 /** Returns true iff the given buff application or heal can be matched back to a hardcast */
@@ -74,12 +77,6 @@ export function isFromFieldOfDreams(event: HealEvent) {
 
 export function didEchoExpire(event: RemoveBuffEvent) {
   return !HasRelatedEvent(event, ECHO) && !HasRelatedEvent(event, ECHO_TEMPORAL_ANOMALY);
-}
-
-export function getEssenceBurstConsumeAbility(
-  event: RemoveBuffEvent | RemoveBuffStackEvent,
-): null | CastEvent {
-  return GetRelatedEvent<CastEvent>(event, ESSENCE_BURST_CONSUME) ?? null;
 }
 
 export function getHealForLifebindHeal(event: HealEvent): HealEvent | null {
@@ -218,30 +215,9 @@ export function getLifesparkLivingFlame(event: RemoveBuffEvent | RemoveBuffStack
   return GetRelatedEvent(event, LIFESPARK_LIVING_FLAME) ?? null;
 }
 
-export function getT32SourceEvent(event: HealEvent): HealEvent | undefined {
-  return GetRelatedEvent<HealEvent>(event, T32_2PC);
-}
-
-export function isRevBuffedFromT32(event: HealEvent): boolean {
-  const applyEvent = GetRelatedEvent<ApplyBuffEvent | RefreshBuffEvent>(event, REVERSION);
-  if (!applyEvent) {
-    return false;
-  }
-  return HasRelatedEvent(applyEvent, T32_4PC);
-}
-
-export function isT32ProcWasted(event: RemoveBuffEvent | RefreshBuffEvent): boolean {
-  return event.type === EventType.RefreshBuff || !HasRelatedEvent(event, T32_4PC);
-}
-
 //Gets the cast event from a blossom heal
 export function getBlossomCast(event: HealEvent) {
   return GetRelatedEvent<CastEvent>(event, EMERALD_BLOSSOM_CAST);
-}
-
-//Find if a cast was from an essence burst
-export function isCastFromBurst(event: CastEvent) {
-  return HasRelatedEvent(event, ESSENCE_BURST_CONSUME);
 }
 
 export function getEchoAplication(event: HealEvent | ApplyBuffEvent | RefreshBuffEvent) {
@@ -254,10 +230,67 @@ export function getEchoAplication(event: HealEvent | ApplyBuffEvent | RefreshBuf
   }
 }
 
-export function getDreamBreathHealing(event: ApplyBuffEvent | RefreshBuffEvent) {
+export function getDreamBreathHealing(event: ApplyBuffEvent | RefreshBuffEvent | CastEvent) {
+  if (event.type === EventType.Cast) {
+    const applyEvent = GetRelatedEvent(event, DREAM_BREATH_CAST);
+    if (applyEvent) {
+      return GetRelatedEvents<HealEvent>(applyEvent, DREAM_BREATH);
+    }
+  }
   return GetRelatedEvents<HealEvent>(event, DREAM_BREATH);
+}
+
+export function getDreamBreathCast(
+  event: ApplyBuffEvent | RefreshBuffEvent | HealEvent,
+  searchStasis: boolean = true,
+) {
+  let castEvent;
+  if (event.type === EventType.Heal) {
+    const applyEvent = GetRelatedEvent(event, DREAM_BREATH);
+    if (applyEvent) {
+      castEvent = GetRelatedEvent<EmpowerEndEvent>(applyEvent, DREAM_BREATH_CAST);
+    }
+  } else {
+    castEvent = GetRelatedEvent<EmpowerEndEvent>(event, DREAM_BREATH_CAST);
+  }
+  if (!castEvent && searchStasis) {
+    const stasisEvent = GetRelatedEvent(event, DREAM_BREATH_FROM_STASIS);
+    if (stasisEvent) {
+      const stasisFill = GetRelatedEvents(stasisEvent, STASIS_FILLING);
+      if (stasisFill) {
+        const foundCast = stasisFill.find(function (cast) {
+          const stasisSpell = GetRelatedEvent(cast, STASIS);
+          return (
+            stasisSpell &&
+            stasisSpell.type === EventType.EmpowerEnd &&
+            stasisSpell.ability.name === event.ability.name
+          );
+        });
+        if (foundCast) {
+          return GetRelatedEvent<EmpowerEndEvent>(foundCast, STASIS);
+        }
+      }
+    }
+  } else {
+    return castEvent;
+  }
 }
 
 export function getReversionHealing(event: ApplyBuffEvent | RefreshBuffEvent) {
   return GetRelatedEvents<HealEvent>(event, REVERSION);
+}
+
+export function getConsumeFromEngulf(event: CastEvent) {
+  return GetRelatedEvents<HealEvent>(event, ENGULF_CONSUME_FLAME);
+}
+
+export function getLifebindTargets(event: ApplyBuffEvent) {
+  return GetRelatedEvents<HealEvent>(event, LIFEBIND_APPLY);
+}
+
+export function isInsuranceFromVe(event: HealEvent) {
+  const insuranceApplication = GetRelatedEvent(event, INSURANCE_APPLICATION);
+  if (insuranceApplication) {
+    return HasRelatedEvent(insuranceApplication, VERDANT_EMBRACE_INSURANCE);
+  }
 }

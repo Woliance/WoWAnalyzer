@@ -13,7 +13,9 @@ import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import TalentSpellText from 'parser/ui/TalentSpellText';
 import ItemHealingDone from 'parser/ui/ItemHealingDone';
 import SpellLink from 'interface/SpellLink';
-import { formatNumber } from 'common/format';
+import { formatNumber, formatPercentage } from 'common/format';
+import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
+import { getCurrentRSKTalent } from '../../constants';
 
 class CraneStyle extends Analyzer {
   gomHealing: number = 0;
@@ -52,6 +54,15 @@ class CraneStyle extends Analyzer {
     return true;
   }
 
+  subStatistic() {
+    return (
+      <StatisticListBoxItem
+        title={<SpellLink spell={TALENTS_MONK.CRANE_STYLE_TALENT} />}
+        value={`${formatPercentage(this.owner.getPercentageOfTotalHealingDone(this.gomHealing))} %`}
+      />
+    );
+  }
+
   statistic() {
     return (
       <Statistic
@@ -64,7 +75,7 @@ class CraneStyle extends Analyzer {
             <ul>
               <li>
                 {formatNumber(this.rskHealing)} from{' '}
-                <SpellLink spell={TALENTS_MONK.RISING_SUN_KICK_TALENT} />
+                <SpellLink spell={getCurrentRSKTalent(this.selectedCombatant)} />
               </li>
               <li>
                 {formatNumber(this.bokHealing)} from <SpellLink spell={SPELLS.BLACKOUT_KICK} />

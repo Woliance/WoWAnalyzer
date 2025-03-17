@@ -45,7 +45,6 @@ import NozTeachings from './modules/talents/NozTeachings';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import RegenerativeMagic from '../shared/modules/talents/RegenerativeMagic';
 import AncientFlame from './modules/talents/AncientFlame';
-import TitansGift from './modules/talents/TitansGift';
 import EchoTypeBreakdown from './modules/talents/EchoTypeBreakdown';
 import {
   LivingFlameNormalizer,
@@ -62,11 +61,23 @@ import {
   SourceOfMagic,
   PotentMana,
   Engulf,
+  Panacea,
+  ExpandedLungs,
+  RedHot,
+  Reverberations,
+  Chronoflame,
+  ThreadsOfFate,
+  DoubleTime,
+  Primacy,
+  TimeConvergence,
+  MasterOfDestiny,
+  MotesOfAcceleration,
+  TimeSpiral,
+  MobilityCastLinkNormalizer,
 } from '../shared';
 import T32Prevoker from './modules/tier/T32TierSet';
-import ExpandedLungs from '../shared/modules/talents/hero/flameshaper/ExpandedLungs';
-import FanTheFlames from '../shared/modules/talents/hero/flameshaper/FanTheFlames';
-import RedHot from '../shared/modules/talents/hero/flameshaper/RedHot';
+import T33Prevoker from './modules/tier/T33TierSet';
+import ConsumeFlame from './modules/talents/ConsumeFlame';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -103,6 +114,9 @@ class CombatLogParser extends CoreCombatLogParser {
     leapingFlames: LeapingFlames,
     sourceOfMagic: SourceOfMagic,
     potentMana: PotentMana,
+    panacea: Panacea,
+    timeSpiral: TimeSpiral,
+    mobilityCastLinkNormalizer: MobilityCastLinkNormalizer,
 
     // Empower Normalizer
     empowerNormalizer: EmpowerNormalizer,
@@ -142,16 +156,24 @@ class CombatLogParser extends CoreCombatLogParser {
     echoTypeBreakdown: EchoTypeBreakdown,
     essenceBurstSources: EssenceBurstSources,
     lifespark: Lifespark,
-    titansGift: TitansGift,
 
     // hero talents
     engulf: Engulf,
     expandedLungs: ExpandedLungs,
-    FanTheFlames: FanTheFlames,
     redHot: RedHot,
+    reverberations: Reverberations,
+    chronoflame: Chronoflame,
+    threadsOfFate: ThreadsOfFate,
+    doubleTime: DoubleTime,
+    consumeFlame: ConsumeFlame,
+    primacy: Primacy,
+    timeConvergence: TimeConvergence,
+    masterOfDestiny: MasterOfDestiny,
+    motesOfAcceleration: MotesOfAcceleration,
 
     // other
     t32Prevoker: T32Prevoker,
+    t33Prevoker: T33Prevoker,
   };
   static guide = Guide;
 }

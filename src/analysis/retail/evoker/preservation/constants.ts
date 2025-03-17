@@ -80,6 +80,7 @@ export const STASIS_CAST_IDS = [
   TALENTS_EVOKER.SPIRITBLOOM_TALENT.id,
   SPELLS.SPIRITBLOOM_FONT.id,
   SPELLS.NATURALIZE.id,
+  TALENTS_EVOKER.ENGULF_TALENT.id,
 ];
 
 export const CYCLE_SPELLS = [
@@ -117,6 +118,8 @@ export const LIFESPARK_INCREASE = 0.5;
 export const RENEWING_BREATH_INCREASE = 0.15;
 export const TIMELESS_MAGIC = 0.15;
 export const TIMELORD_INCREASE = 0.25;
+export const DOUBLE_TIME_EXTENSION = 2;
+export const LIFEBIND_DURATION = 5000;
 
 export function getSpellIds(spells: Spell[]) {
   return spells.map((spell) => spell.id);

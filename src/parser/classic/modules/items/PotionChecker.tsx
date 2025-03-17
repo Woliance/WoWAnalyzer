@@ -32,6 +32,7 @@ const STRONG_POTIONS: number[] = [
   SPELLS.MIGHTY_REJUVENATION_POTION.id,
   SPELLS.MYTHICAL_HEALING_POTION.id,
   SPELLS.MYTHICAL_MANA_POTION.id,
+  SPELLS.POTION_OF_CONCENTRATION.id,
   SPELLS.POTION_OF_THE_TOLVIR.id,
   SPELLS.VOLCANIC_POTION.id,
 ];
@@ -119,7 +120,7 @@ class ClassicPotionChecker extends Analyzer {
   }
 
   get maxPotions() {
-    return 1;
+    return 2;
   }
 
   get potionsUsedThresholds() {

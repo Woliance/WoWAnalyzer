@@ -22,12 +22,16 @@ class Abilities extends CoreAbilities {
 
   spellbook(): Array<SpellbookAbility<TrackedRestoShamanAbility>> {
     const combatant = this.selectedCombatant;
+    const totemCDR = combatant.hasTalent(TALENTS.TOTEMIC_SURGE_TALENT) ? 6 : 0;
     return [
       {
         spell: TALENTS.RIPTIDE_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         enabled: combatant.hasTalent(TALENTS.RIPTIDE_TALENT),
-        charges: combatant.hasTalent(TALENTS.ECHO_OF_THE_ELEMENTS_TALENT) ? 2 : 1,
+        charges:
+          1 +
+          combatant.getTalentRank(TALENTS.ECHO_OF_THE_ELEMENTS_TALENT) +
+          combatant.getTalentRank(TALENTS.ELEMENTAL_REVERB_TALENT),
         cooldown: 6,
         timelineSortIndex: 11,
         gcd: {
@@ -41,7 +45,7 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.HEALING_STREAM_TOTEM_SHARED_TALENT.id,
+        spell: [SPELLS.HEALING_STREAM_TOTEM.id],
         category: SPELL_CATEGORY.ROTATIONAL,
         charges: combatant.getMultipleTalentRanks(
           TALENTS.HEALING_STREAM_TOTEM_SHARED_TALENT,
@@ -55,7 +59,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           static: totemGCD,
         },
-        cooldown: 30,
+        cooldown: 30 - totemCDR,
         castEfficiency: {
           suggestion: false,
           // majorIssueEfficiency: 0.5,
@@ -79,13 +83,30 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: TALENTS.HEALING_RAIN_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.HEALING_RAIN_TALENT),
+        enabled:
+          combatant.hasTalent(TALENTS.HEALING_RAIN_TALENT) &&
+          !combatant.hasTalent(TALENTS.SURGING_TOTEM_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: 10,
         timelineSortIndex: 17,
         gcd: {
           base: 1500,
         },
+        castEfficiency: {
+          suggestion: false,
+          // majorIssueEfficiency: 0.3,
+          // averageIssueEfficiency: 0.5,
+          // recommendedEfficiency: 0.7,
+        },
+        healSpellIds: [SPELLS.HEALING_RAIN_HEAL.id],
+      },
+      {
+        spell: SPELLS.HEALING_RAIN_TOTEMIC.id,
+        enabled: combatant.hasTalent(TALENTS.SURGING_TOTEM_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        cooldown: 30 - totemCDR,
+        timelineSortIndex: 17,
+        gcd: null,
         castEfficiency: {
           suggestion: false,
           // majorIssueEfficiency: 0.3,
@@ -117,7 +138,7 @@ class Abilities extends CoreAbilities {
         buffSpellId: TALENTS.CLOUDBURST_TOTEM_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         charges: combatant.hasTalent(TALENTS.ECHO_OF_THE_ELEMENTS_TALENT) ? 2 : 1,
-        cooldown: 30,
+        cooldown: 45 - totemCDR,
         timelineSortIndex: 16,
         gcd: {
           static: totemGCD,
@@ -134,7 +155,7 @@ class Abilities extends CoreAbilities {
         spell: TALENTS.EARTHEN_WALL_TOTEM_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.EARTHEN_WALL_TOTEM_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 60,
+        cooldown: 60 - totemCDR,
         timelineSortIndex: 20,
         gcd: {
           static: totemGCD,
@@ -169,7 +190,7 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS.ASCENDANCE_RESTORATION_TALENT),
         buffSpellId: TALENTS.ASCENDANCE_RESTORATION_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 180,
+        cooldown: combatant.hasTalent(TALENTS.FIRST_ASCENDANT_TALENT) ? 120 : 180,
         gcd: {
           base: 1500,
         },
@@ -186,7 +207,7 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS.HEALING_TIDE_TOTEM_TALENT),
         buffSpellId: TALENTS.HEALING_TIDE_TOTEM_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 180,
+        cooldown: (combatant.hasTalent(TALENTS.CURRENT_CONTROL_TALENT) ? 135 : 180) - totemCDR,
         gcd: {
           static: totemGCD,
         },
@@ -202,7 +223,7 @@ class Abilities extends CoreAbilities {
         spell: TALENTS.SPIRIT_LINK_TOTEM_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.SPIRIT_LINK_TOTEM_TALENT),
         category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 180,
+        cooldown: 180 - totemCDR,
         gcd: {
           static: totemGCD,
         },
@@ -213,24 +234,9 @@ class Abilities extends CoreAbilities {
           // recommendedEfficiency: 0.6,
         },
       },
+
       {
-        spell: TALENTS.MANA_TIDE_TOTEM_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.MANA_TIDE_TOTEM_TALENT),
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 180,
-        gcd: {
-          static: totemGCD,
-        },
-        castEfficiency: {
-          suggestion: false,
-          // majorIssueEfficiency: 0.2,
-          // averageIssueEfficiency: 0.4,
-          // recommendedEfficiency: 0.6,
-        },
-      },
-      {
-        spell: TALENTS.HEALING_WAVE_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.HEALING_WAVE_TALENT),
+        spell: SPELLS.HEALING_WAVE.id,
         timelineSortIndex: 13,
         gcd: {
           base: 1500,
@@ -242,12 +248,11 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.HEALING_WAVE_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.HEALING_WAVE_TALENT),
+        spell: SPELLS.HEALING_WAVE.id,
         name: i18n._(
           defineMessage({
             id: 'shaman.restoration.abilities.buffedByTidalWave',
-            message: `Tidal Waved ${TALENTS.HEALING_WAVE_TALENT.name}`,
+            message: `Tidal Waved ${SPELLS.HEALING_WAVE.name}`,
           }),
         ),
         timelineSortIndex: 13,
@@ -298,19 +303,7 @@ class Abilities extends CoreAbilities {
           base: 1500,
         },
       },
-      {
-        spell: TALENTS.PRIMORDIAL_WAVE_RESTORATION_TALENT.id,
-        buffSpellId: SPELLS.PRIMORDIAL_WAVE_BUFF.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        timelineSortIndex: 12,
-        gcd: {
-          base: 1500,
-        },
-        enabled: combatant.hasTalent(TALENTS.PRIMORDIAL_WAVE_RESTORATION_TALENT),
-        cooldown: 45,
-        // Cannot find any logs with the heal
-        // healSpellIds: [SPELLS.PRIMORDIAL_WAVE_HEAL.id],
-      },
+
       {
         spell: SPELLS.PURIFY_SPIRIT.id,
         category: SPELL_CATEGORY.UTILITY,
@@ -373,7 +366,15 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS.SPIRITWALKERS_GRACE_TALENT),
         buffSpellId: TALENTS.SPIRITWALKERS_GRACE_TALENT.id,
         category: SPELL_CATEGORY.UTILITY,
-        cooldown: combatant.hasTalent(TALENTS.GRACEFUL_SPIRIT_TALENT) ? 60 : 120,
+        cooldown: combatant.hasTalent(TALENTS.GRACEFUL_SPIRIT_TALENT) ? 90 : 120,
+        timelineSortIndex: 81,
+      },
+      {
+        spell: TALENTS.SPIRIT_WALK_TALENT.id,
+        enabled: combatant.hasTalent(TALENTS.SPIRIT_WALK_TALENT),
+        buffSpellId: TALENTS.SPIRIT_WALK_TALENT.id,
+        category: SPELL_CATEGORY.UTILITY,
+        cooldown: 60,
         timelineSortIndex: 81,
       },
       {
@@ -383,7 +384,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           base: totemGCD, // totem GCD but affected by Haste for some reason
         },
-        cooldown: 30,
+        cooldown: 30 - totemCDR,
       },
       {
         spell: TALENTS.PURGE_TALENT.id,
@@ -402,7 +403,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           static: totemGCD,
         },
-        cooldown: 60,
+        cooldown: 60 - totemCDR,
       },
       {
         spell: TALENTS.WIND_RUSH_TOTEM_TALENT.id,
@@ -412,7 +413,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           static: totemGCD,
         },
-        cooldown: 120,
+        cooldown: 120 - totemCDR,
       },
       {
         spell: TALENTS.EARTHGRAB_TOTEM_TALENT.id,
@@ -422,7 +423,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           static: totemGCD,
         },
-        cooldown: 30,
+        cooldown: 30 - totemCDR,
       },
       {
         spell: TALENTS.ANCESTRAL_PROTECTION_TOTEM_TALENT.id,
@@ -431,7 +432,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           static: totemGCD,
         },
-        cooldown: 300,
+        cooldown: 300 - totemCDR,
       },
       {
         spell: SPELLS.REINCARNATION.id,
@@ -484,17 +485,17 @@ class Abilities extends CoreAbilities {
         spell: TALENTS.TREMOR_TOTEM_TALENT.id,
         enabled: combatant.hasTalent(TALENTS.TREMOR_TOTEM_TALENT),
         category: SPELL_CATEGORY.UTILITY,
-        cooldown: 60,
+        cooldown: 60 - totemCDR,
         gcd: {
           base: totemGCD, // totem GCD but affected by Haste for some reason
         },
         timelineSortIndex: 80,
       },
       {
-        spell: TALENTS.DOWNPOUR_TALENT.id,
+        spell: SPELLS.DOWNPOUR_ABILITY.id,
         enabled: combatant.hasTalent(TALENTS.DOWNPOUR_TALENT),
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 35, // CD changes depending on amount of effective targets hit (0 = 5s, 6 = 35s)
+        cooldown: combatant.hasTalent(TALENTS.SURGING_TOTEM_TALENT) ? 30 - totemCDR : 10,
         gcd: {
           base: 1500,
         },
@@ -538,16 +539,6 @@ class Abilities extends CoreAbilities {
         healSpellIds: [SPELLS.NATURES_GUARDIAN_HEAL.id],
       },
       {
-        spell: SPELLS.ROCKET_JUMP.id,
-        category: SPELL_CATEGORY.UTILITY,
-        timelineSortIndex: 80,
-        cooldown: 90,
-        gcd: {
-          base: 1500,
-        },
-        isUndetectable: true,
-      },
-      {
         spell: SPELLS.WATER_SHIELD.id,
         category: SPELL_CATEGORY.UTILITY,
         gcd: {
@@ -577,14 +568,7 @@ class Abilities extends CoreAbilities {
         gcd: {
           base: 1500,
         },
-        cooldown: 180,
-      },
-      {
-        spell: TALENTS.ANCESTRAL_GUIDANCE_TALENT.id,
-        enabled: combatant.hasTalent(TALENTS.ANCESTRAL_GUIDANCE_TALENT),
-        category: SPELL_CATEGORY.COOLDOWNS,
-        gcd: null,
-        cooldown: 120,
+        cooldown: combatant.hasTalent(TALENTS.CALL_OF_THE_ELEMENTS_TALENT) ? 120 : 180,
       },
       {
         spell: TALENTS.NATURES_SWIFTNESS_TALENT.id,
@@ -592,6 +576,42 @@ class Abilities extends CoreAbilities {
         category: SPELL_CATEGORY.UTILITY,
         gcd: null,
         cooldown: 60,
+      },
+      {
+        spell: SPELLS.ANCESTRAL_SWIFTNESS_CAST.id,
+        enabled: combatant.hasTalent(TALENTS.ANCESTRAL_SWIFTNESS_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: null,
+        cooldown: 30,
+      },
+      {
+        spell: SPELLS.SURGING_TOTEM.id,
+        enabled: combatant.hasTalent(TALENTS.SURGING_TOTEM_TALENT),
+        category: SPELL_CATEGORY.ROTATIONAL,
+        cooldown: 30 - totemCDR,
+        timelineSortIndex: 17,
+        gcd: {
+          base: 1000,
+        },
+        healSpellIds: [SPELLS.HEALING_RAIN_TOTEMIC.id],
+      },
+      {
+        spell: SPELLS.SKYFURY.id,
+        enabled: true,
+        category: SPELL_CATEGORY.OTHERS,
+        cooldown: 0,
+        gcd: {
+          base: 1500,
+        },
+      },
+      {
+        spell: TALENTS.TOTEMIC_PROJECTION_TALENT.id,
+        enabled: combatant.hasTalent(TALENTS.TOTEMIC_PROJECTION_TALENT),
+        category: SPELL_CATEGORY.UTILITY,
+        cooldown: 10,
+        gcd: {
+          base: 1500,
+        },
       },
     ];
   }

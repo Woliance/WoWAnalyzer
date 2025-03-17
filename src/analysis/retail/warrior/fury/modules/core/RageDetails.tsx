@@ -1,49 +1,61 @@
 import { defineMessage } from '@lingui/macro';
+import WarriorRageDetails from 'analysis/retail/warrior/shared/modules/core/RageDetails';
 import { formatPercentage } from 'common/format';
-import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
-import { Panel } from 'interface';
-import Analyzer from 'parser/core/Analyzer';
 import { ThresholdStyle, When } from 'parser/core/ParseResults';
-import ResourceBreakdown from 'parser/shared/modules/resources/resourcetracker/ResourceBreakdown';
-import BoringResourceValue from 'parser/ui/BoringResourceValue';
-import Statistic from 'parser/ui/Statistic';
-import { STATISTIC_ORDER } from 'parser/ui/StatisticBox';
+import { TALENTS_WARRIOR } from 'common/TALENTS';
 
-import RageTracker from './RageTracker';
-
-class RageDetails extends Analyzer {
-  static dependencies = {
-    rageTracker: RageTracker,
-  };
-
-  protected rageTracker!: RageTracker;
-
-  get wastedPercent() {
-    return this.rageTracker.wasted / (this.rageTracker.wasted + this.rageTracker.generated) || 0;
-  }
+class RageDetails extends WarriorRageDetails {
+  hasRecklessAbandon: boolean = this.selectedCombatant.hasTalent(
+    TALENTS_WARRIOR.RECKLESS_ABANDON_TALENT,
+  );
 
   get efficiencySuggestionThresholds() {
-    return {
-      actual: 1 - this.wastedPercent,
-      isLessThan: {
-        minor: 0.95,
-        average: 0.9,
-        major: 0.85,
-      },
-      style: ThresholdStyle.PERCENTAGE,
-    };
+    // Reckless Abandon cares much less about wasting rage than Anger Management does
+    if (this.hasRecklessAbandon) {
+      return {
+        actual: this.wastedPercent,
+        isGreaterThan: {
+          minor: 0.75,
+          average: 0.7,
+          major: 0.65,
+        },
+        style: ThresholdStyle.PERCENTAGE,
+      };
+    } else {
+      return {
+        actual: 1 - this.wastedPercent,
+        isLessThan: {
+          minor: 0.95,
+          average: 0.9,
+          major: 0.85,
+        },
+        style: ThresholdStyle.PERCENTAGE,
+      };
+    }
   }
 
   get suggestionThresholds() {
-    return {
-      actual: this.wastedPercent,
-      isGreaterThan: {
-        minor: 0.05,
-        average: 0.1,
-        major: 0.15,
-      },
-      style: ThresholdStyle.PERCENTAGE,
-    };
+    if (this.hasRecklessAbandon) {
+      return {
+        actual: this.wastedPercent,
+        isGreaterThan: {
+          minor: 0.25,
+          average: 0.3,
+          major: 0.35,
+        },
+        style: ThresholdStyle.PERCENTAGE,
+      };
+    } else {
+      return {
+        actual: this.wastedPercent,
+        isGreaterThan: {
+          minor: 0.08,
+          average: 0.15,
+          major: 0.25,
+        },
+        style: ThresholdStyle.PERCENTAGE,
+      };
+    }
   }
 
   suggestions(when: When) {
@@ -58,36 +70,6 @@ class RageDetails extends Analyzer {
         )
         .recommended(`<${formatPercentage(recommended)}% is recommended`),
     );
-  }
-
-  statistic() {
-    return (
-      <Statistic
-        position={STATISTIC_ORDER.CORE(3)}
-        size="flexible"
-        tooltip={`${this.rageTracker.wasted} out of ${
-          this.rageTracker.wasted + this.rageTracker.generated
-        } Rage wasted.`}
-      >
-        <BoringResourceValue
-          resource={RESOURCE_TYPES.RAGE}
-          value={`${formatPercentage(this.wastedPercent)} %`}
-          label="Rage wasted"
-        />
-      </Statistic>
-    );
-  }
-
-  tab() {
-    return {
-      title: 'Rage usage',
-      url: 'rage-usage',
-      render: () => (
-        <Panel>
-          <ResourceBreakdown tracker={this.rageTracker} showSpenders />
-        </Panel>
-      ),
-    };
   }
 }
 

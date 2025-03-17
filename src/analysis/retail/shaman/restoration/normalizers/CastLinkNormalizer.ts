@@ -13,14 +13,12 @@ import {
 import { Options } from 'parser/core/Module';
 import talents from 'common/TALENTS/shaman';
 import {
-  APPLIED_HEAL,
   PRIMAL_TIDE_CORE,
   HARDCAST,
   RIPTIDE_PWAVE,
   HEALING_WAVE_PWAVE,
   PWAVE_REMOVAL,
   CAST_BUFFER_MS,
-  PWAVE_TRAVEL_MS,
   HEALING_RAIN_DURATION,
   HEALING_RAIN,
   OVERFLOWING_SHORES,
@@ -30,12 +28,18 @@ import {
   FLOW_OF_THE_TIDES,
   DOWNPOUR,
   HIGH_TIDE,
+  WHIRLINGAIR_HEAL,
+  WHIRLINGEARTH_HEAL,
+  WHIRLINGWATER_HEAL,
+  LIVELY_TOTEMS_CHAIN_HEAL,
+  REACTIVITY,
 } from '../constants';
 import SPELLS from 'common/SPELLS';
+import TALENTS from 'common/TALENTS/shaman';
 
 /*
   This file is for attributing the various sources of spell applications to their respective abilities and talents.
-  It is needed because there are certain abilities that can have multiple sources based on talents, 
+  It is needed because there are certain abilities that can have multiple sources based on talents,
   i.e. riptide -> primorial wave & primal tide core
 */
 const EVENT_LINKS: EventLink[] = [
@@ -51,22 +55,6 @@ const EVENT_LINKS: EventLink[] = [
     isActive(c) {
       //extremely unlikely but you never know
       return c.hasTalent(talents.RIPTIDE_TALENT);
-    },
-  },
-  {
-    linkRelation: RIPTIDE_PWAVE,
-    reverseLinkRelation: APPLIED_HEAL,
-    linkingEventId: [talents.RIPTIDE_TALENT.id],
-    linkingEventType: [EventType.ApplyBuff, EventType.RefreshBuff, EventType.Heal],
-    referencedEventId: [talents.PRIMORDIAL_WAVE_RESTORATION_TALENT.id],
-    referencedEventType: [EventType.Cast],
-    forwardBufferMs: PWAVE_TRAVEL_MS,
-    backwardBufferMs: PWAVE_TRAVEL_MS,
-    additionalCondition(referencedEvent) {
-      return (referencedEvent as CastEvent).targetIsFriendly;
-    },
-    isActive(c) {
-      return c.hasTalent(talents.PRIMORDIAL_WAVE_RESTORATION_TALENT);
     },
   },
   {
@@ -97,46 +85,15 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: HARDCAST,
     reverseLinkRelation: HARDCAST,
-    linkingEventId: [talents.HEALING_WAVE_TALENT.id],
+    linkingEventId: [SPELLS.HEALING_WAVE.id],
     linkingEventType: [EventType.Heal],
-    referencedEventId: [talents.HEALING_WAVE_TALENT.id],
+    referencedEventId: [SPELLS.HEALING_WAVE.id],
     referencedEventType: [EventType.Cast],
     maximumLinks: 1,
     backwardBufferMs: CAST_BUFFER_MS,
     forwardBufferMs: CAST_BUFFER_MS,
   },
-  {
-    linkRelation: HEALING_WAVE_PWAVE,
-    linkingEventId: [talents.HEALING_WAVE_TALENT.id],
-    linkingEventType: [EventType.Heal],
-    referencedEventId: [talents.HEALING_WAVE_TALENT.id],
-    referencedEventType: [EventType.Cast],
-    anyTarget: true,
-    backwardBufferMs: PWAVE_TRAVEL_MS,
-    forwardBufferMs: PWAVE_TRAVEL_MS,
-    additionalCondition(linkingEvent, referencedEvent) {
-      return (
-        !HasRelatedEvent(linkingEvent, HARDCAST) &&
-        (linkingEvent as HealEvent).sourceID === (referencedEvent as CastEvent).sourceID
-      );
-    },
-    isActive(c) {
-      return c.hasTalent(talents.PRIMORDIAL_WAVE_RESTORATION_TALENT);
-    },
-  },
-  {
-    linkRelation: PWAVE_REMOVAL,
-    linkingEventId: [SPELLS.PRIMORDIAL_WAVE_BUFF.id],
-    linkingEventType: [EventType.RemoveBuff],
-    referencedEventId: [talents.HEALING_WAVE_TALENT.id],
-    referencedEventType: [EventType.Cast],
-    backwardBufferMs: CAST_BUFFER_MS,
-    forwardBufferMs: CAST_BUFFER_MS,
-    anyTarget: true,
-    isActive(c) {
-      return c.hasTalent(talents.PRIMORDIAL_WAVE_RESTORATION_TALENT);
-    },
-  },
+
   //healing rain linking
   {
     linkRelation: HEALING_RAIN,
@@ -257,9 +214,9 @@ const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: DOWNPOUR,
     reverseLinkRelation: DOWNPOUR,
-    linkingEventId: [talents.DOWNPOUR_TALENT.id],
+    linkingEventId: [SPELLS.DOWNPOUR_HEAL.id],
     linkingEventType: EventType.Heal,
-    referencedEventId: [talents.DOWNPOUR_TALENT.id],
+    referencedEventId: [SPELLS.DOWNPOUR_ABILITY.id],
     referencedEventType: EventType.Cast,
     backwardBufferMs: CAST_BUFFER_MS,
     forwardBufferMs: CAST_BUFFER_MS,
@@ -269,6 +226,92 @@ const EVENT_LINKS: EventLink[] = [
     },
     additionalCondition(linkingEvent, referencedEvent) {
       return (linkingEvent as HealEvent).sourceID === (referencedEvent as CastEvent).sourceID;
+    },
+  },
+  // Whirling Elements buffs
+  // Whirling Air : The cast time of your next healing spell is reduced by 40%
+  {
+    linkRelation: WHIRLINGAIR_HEAL,
+    reverseLinkRelation: WHIRLINGAIR_HEAL,
+    linkingEventId: [SPELLS.WHIRLING_AIR.id],
+    linkingEventType: [EventType.RemoveBuff],
+    referencedEventId: [
+      SPELLS.HEALING_WAVE.id,
+      SPELLS.HEALING_SURGE.id,
+      talents.CHAIN_HEAL_TALENT.id,
+      talents.WELLSPRING_TALENT.id,
+    ],
+    referencedEventType: [EventType.Cast],
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.WHIRLING_ELEMENTS_TALENT);
+    },
+  },
+  // Whirling Earth : Your next Chain Heal applies Earthliving at 150% effectiveness to all targets hit
+  {
+    linkRelation: WHIRLINGEARTH_HEAL,
+    reverseLinkRelation: WHIRLINGEARTH_HEAL,
+    linkingEventId: [SPELLS.WHIRLING_EARTH.id],
+    linkingEventType: [EventType.RemoveBuff],
+    referencedEventId: [talents.CHAIN_HEAL_TALENT.id],
+    referencedEventType: [EventType.Cast],
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.WHIRLING_ELEMENTS_TALENT);
+    },
+  },
+  // Whirling Water : Your next Healing Wave or Healing Surge also heals an ally inside of your Healing Rain at 100% effectiveness.
+  {
+    linkRelation: WHIRLINGWATER_HEAL,
+    reverseLinkRelation: WHIRLINGWATER_HEAL,
+    linkingEventId: [SPELLS.WHIRLING_WATER.id],
+    linkingEventType: [EventType.RemoveBuff],
+    referencedEventId: [SPELLS.HEALING_WAVE.id, SPELLS.HEALING_SURGE.id],
+    referencedEventType: [EventType.Cast],
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.WHIRLING_ELEMENTS_TALENT);
+    },
+  },
+  // Lively Totems : When you summon a Healing Tide Totem, Healing Stream Totem, Cloudburst Totem, Mana Tide Totem, or Spirit Link Totem you cast a free instant Chain Heal at 100% effectiveness.
+  {
+    linkRelation: LIVELY_TOTEMS_CHAIN_HEAL,
+    reverseLinkRelation: LIVELY_TOTEMS_CHAIN_HEAL,
+    linkingEventId: [TALENTS.CHAIN_HEAL_TALENT.id],
+    linkingEventType: [EventType.Cast, EventType.Heal],
+    referencedEventId: [
+      talents.HEALING_TIDE_TOTEM_TALENT.id,
+      talents.HEALING_STREAM_TOTEM_SHARED_TALENT.id,
+      talents.HEALING_STREAM_TOTEM_RESTORATION_TALENT.id,
+      talents.CLOUDBURST_TOTEM_TALENT.id,
+      talents.SPIRIT_LINK_TOTEM_TALENT.id,
+    ],
+    referencedEventType: [EventType.Cast, EventType.Heal],
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.LIVELY_TOTEMS_TALENT);
+    },
+  },
+  // Reactivity: Your Healing Stream Totems now also heals a second ally at 50% effectiveness. Cloudburst Totem stores 25% additional healing.
+  {
+    linkRelation: REACTIVITY,
+    linkingEventId: [SPELLS.HEALING_STREAM_TOTEM_HEAL.id],
+    linkingEventType: [EventType.Heal],
+    referencedEventId: [SPELLS.HEALING_STREAM_TOTEM_HEAL.id],
+    referencedEventType: [EventType.Heal],
+    backwardBufferMs: 5,
+    forwardBufferMs: 5,
+    anyTarget: true,
+    isActive(c) {
+      return c.hasTalent(talents.REACTIVITY_TALENT);
     },
   },
 ];
@@ -295,14 +338,6 @@ export function isHealingWaveFromPrimordialWave(event: HealEvent): boolean {
 
 export function wasPrimordialWaveConsumed(event: RemoveBuffEvent): boolean {
   return HasRelatedEvent(event, PWAVE_REMOVAL);
-}
-
-export function isFrom4pcT31(event: ApplyBuffEvent | HealEvent): boolean {
-  return (
-    !HasRelatedEvent(event, HARDCAST) &&
-    !HasRelatedEvent(event, RIPTIDE_PWAVE) &&
-    !HasRelatedEvent(event, PRIMAL_TIDE_CORE)
-  );
 }
 
 export function isFromPrimalTideCore(event: ApplyBuffEvent | HealEvent): boolean {
@@ -335,6 +370,32 @@ export function getChainHeals(event: CastEvent): HealEvent[] {
 
 export function isBuffedByHighTide(event: CastEvent) {
   return HasRelatedEvent(event, HIGH_TIDE);
+}
+
+export function didMoteExpire(event: RemoveBuffEvent) {
+  switch (event.ability.guid) {
+    case SPELLS.WHIRLING_AIR.id: {
+      return !HasRelatedEvent(event, WHIRLINGAIR_HEAL);
+    }
+    case SPELLS.WHIRLING_EARTH.id: {
+      return !HasRelatedEvent(event, WHIRLINGEARTH_HEAL);
+    }
+    case SPELLS.WHIRLING_WATER.id: {
+      return !HasRelatedEvent(event, WHIRLINGWATER_HEAL);
+    }
+  }
+}
+
+export function isLivelyTotemsChainHealCast(event: CastEvent) {
+  return HasRelatedEvent(event, LIVELY_TOTEMS_CHAIN_HEAL);
+}
+
+export function isLivelyTotemsChainHeal(event: HealEvent) {
+  return HasRelatedEvent(event, LIVELY_TOTEMS_CHAIN_HEAL);
+}
+
+export function isReactivityHeal(event: HealEvent) {
+  return HasRelatedEvent(event, REACTIVITY);
 }
 
 export default CastLinkNormalizer;

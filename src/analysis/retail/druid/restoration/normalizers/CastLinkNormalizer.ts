@@ -15,7 +15,7 @@ import {
 import { Options } from 'parser/core/Module';
 import { TALENTS_DRUID } from 'common/TALENTS';
 
-const CAST_BUFFER_MS = 65;
+const CAST_BUFFER_MS = 150;
 const TRANQ_CHANNEL_BUFFER_MS = 10_000;
 
 const APPLIED_HEAL = 'AppliedHeal';
@@ -52,7 +52,7 @@ const EVENT_LINKS: EventLink[] = [
     reverseLinkRelation: APPLIED_HEAL,
     linkingEventId: [SPELLS.LIFEBLOOM_HOT_HEAL.id, SPELLS.LIFEBLOOM_UNDERGROWTH_HOT_HEAL.id],
     linkingEventType: [EventType.ApplyBuff, EventType.RefreshBuff],
-    referencedEventId: SPELLS.LIFEBLOOM_HOT_HEAL.id,
+    referencedEventId: [SPELLS.LIFEBLOOM_HOT_HEAL.id, SPELLS.LIFEBLOOM_UNDERGROWTH_HOT_HEAL.id],
     referencedEventType: EventType.Cast,
     forwardBufferMs: CAST_BUFFER_MS,
     backwardBufferMs: CAST_BUFFER_MS,

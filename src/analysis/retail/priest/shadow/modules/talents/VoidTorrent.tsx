@@ -151,7 +151,8 @@ class VoidTorrent extends Analyzer {
         tooltip={
           <>
             <div>
-              {formatSeconds(this.timeWasted)} seconds wasted by cancelling the channel early.{' '}
+              {formatSeconds(this.totalWastedTime / 1000)} seconds wasted by cancelling the channel
+              early.{' '}
             </div>
             <div>
               {formatNumber(this.insanityWasted)} insanity wasted by cancelling the channel early or
@@ -199,7 +200,7 @@ class VoidTorrent extends Analyzer {
         </b>{' '}
         deals damage and generates 24 insanity over its 3 second channel.
         <br />
-        You should cast this spell as often as you can, without overcapping insanity, whith{' '}
+        You should cast this spell as often as you can, without overcapping insanity, with{' '}
         <SpellLink spell={TALENTS.DEVOURING_PLAGUE_TALENT} /> on your target. When you use this
         spell, it should always be fully channeled.
       </p>

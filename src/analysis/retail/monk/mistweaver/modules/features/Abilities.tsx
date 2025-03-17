@@ -142,10 +142,10 @@ class Abilities extends CoreAbilities {
         timelineSortIndex: 17,
       },
       {
-        spell: TALENTS_MONK.CHI_BURST_TALENT.id,
+        spell: TALENTS_MONK.CHI_BURST_SHARED_TALENT.id,
         category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 30,
-        enabled: combatant.hasTalent(TALENTS_MONK.CHI_BURST_TALENT),
+        enabled: combatant.hasTalent(TALENTS_MONK.CHI_BURST_SHARED_TALENT),
         castEfficiency: {
           suggestion: true,
         },
@@ -209,8 +209,8 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS_MONK.DIFFUSE_MAGIC_TALENT),
       },
       {
-        spell: SPELLS.FORTIFYING_BREW_BRM.id,
-        buffSpellId: SPELLS.FORTIFYING_BREW_BRM_BUFF.id,
+        spell: SPELLS.FORTIFYING_BREW_CAST.id,
+        buffSpellId: SPELLS.FORTIFYING_BREW_BUFF.id,
         category: SPELL_CATEGORY.DEFENSIVE,
         cooldown: combatant.hasTalent(TALENTS_MONK.EXPEDITIOUS_FORTIFICATION_TALENT) ? 90 : 120,
         enabled: combatant.hasTalent(TALENTS_MONK.FORTIFYING_BREW_TALENT),
@@ -330,6 +330,20 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: combatant.hasTalent(TALENTS_MONK.RISING_MIST_TALENT),
+        },
+        timelineSortIndex: 100,
+      },
+      {
+        spell: TALENTS_MONK.RUSHING_WIND_KICK_TALENT.id,
+        category: combatant.hasTalent(TALENTS_MONK.RISING_MIST_TALENT)
+          ? SPELL_CATEGORY.ROTATIONAL
+          : SPELL_CATEGORY.HEALER_DAMAGING_SPELL,
+        cooldown: (haste: number) => 12 / (1 + haste),
+        gcd: {
+          base: 1500,
+        },
+        castEfficiency: {
+          suggestion: combatant.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_TALENT),
         },
         timelineSortIndex: 100,
       },

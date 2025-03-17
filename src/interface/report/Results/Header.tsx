@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import getBossName from 'common/getBossName';
 import { getLabel as getDifficultyLabel } from 'game/DIFFICULTIES';
-import { Boss, Phase } from 'game/raids';
+import { Boss, Phase, findZoneByBossId } from 'game/raids';
 import Ad, { AdErrorBoundary, Location } from 'interface/Ad';
 import Config from 'parser/Config';
 import { ParseResultsTab } from 'parser/core/Analyzer';
@@ -9,7 +9,6 @@ import CharacterProfile from 'parser/core/CharacterProfile';
 import Fight from 'parser/core/Fight';
 import { PlayerInfo } from 'parser/core/Player';
 
-import BuildSelection from './BuildSelection';
 import HeaderBackground from './HeaderBackground';
 import NavigationBar from './NavigationBar';
 import PhaseSelector from './PhaseSelector';
@@ -29,7 +28,6 @@ interface Props {
   handlePhaseSelection: (phase: string, instance: number) => void;
   applyFilter: (start: number, end: number) => void;
   phases: { [key: string]: Phase } | null;
-  build?: string;
   selectedPhase: string;
   selectedInstance: number;
   selectedDungeonPull: string;
@@ -41,8 +39,7 @@ interface Props {
 }
 
 const Header = ({
-  config: { spec, builds, branch },
-  build,
+  config: { spec, branch },
   player: { name, icon },
   fight,
   boss,
@@ -71,10 +68,11 @@ const Header = ({
   }
 
   const expansion = currentExpansion(branch);
+  const raid = boss ? findZoneByBossId(boss.id) : undefined;
 
   return (
     <header>
-      <HeaderBackground boss={boss} expansion={expansion} />
+      <HeaderBackground boss={boss} expansion={expansion} raid={raid} />
 
       <AdErrorBoundary>
         <Ad location={Location.Top} />
@@ -118,14 +116,6 @@ const Header = ({
             <img src={playerThumbnail} alt="" />
           </div>
           <div className="details">
-            {builds && (
-              <BuildSelection
-                builds={builds}
-                activeBuild={build}
-                makeUrl={(build: string) => makeTabUrl(selectedTab, build)}
-                className="builds"
-              />
-            )}
             <h2>
               {spec.specName ? i18n._(spec.specName) : ''} {i18n._(spec.className)}
             </h2>

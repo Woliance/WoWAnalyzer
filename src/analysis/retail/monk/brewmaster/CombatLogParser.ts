@@ -31,7 +31,6 @@ import GiftOfTheOxStat from './modules/spells/GiftOfTheOx';
 import HighTolerance from './modules/spells/HighTolerance';
 import KegSmash from './modules/spells/KegSmash';
 import PurifyingBrew from './modules/spells/PurifyingBrew';
-import RushingJadeWind from './modules/spells/RushingJadeWind';
 import WeaponsOfOrder from './modules/talents/WeaponsOfOrder';
 import Shuffle from './modules/spells/Shuffle';
 import TigerPalm from './modules/spells/TigerPalm';
@@ -48,17 +47,16 @@ import StaggeringStrikes from './modules/talents/StaggeringStrikes';
 import QuickSip from './modules/talents/QuickSip';
 import TranquilSpirit from './modules/talents/TranquilSpirit';
 import Salsalabims from './modules/talents/Salsalabims';
-import Attenuation from './modules/talents/Attenuation';
 import AnvilStave from './modules/talents/AnvilStave';
 import ChiSurge from './modules/talents/ChiSurge';
 import BreathOfFireDebuffTargetNormalizer from './modules/spells/BreathOfFire/normalizer';
-import BonedustBrewCastLinkNormalizer from './modules/talents/BonedustBrew/normalizer';
-import BrewmasterT29FourSet from './modules/items/Tier29/FourSet';
 import SpinningCraneKickLinkNormalizer from './normalizers/SpinningCraneKick';
-import CallToDominance from 'parser/retail/modules/items/dragonflight/CallToDominance';
 import PressTheAdvantage from './modules/talents/PressTheAdvantage';
 import PressTheAdvantageNormalizer from './modules/talents/PressTheAdvantage/normalizer';
-import BonedustBrew from './modules/talents/BonedustBrew';
+import WarWithinS1TierSet from './modules/items/WarWithinS1TierSet';
+import VeteransEye from '../shared/hero/ShadoPan/VeteransEye';
+import WarWithinS2TierSet from './modules/items/WarWithinS2TierSet';
+import EfficientTraining from '../shared/hero/ShadoPan/EfficientTraining';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -88,7 +86,6 @@ class CombatLogParser extends CoreCombatLogParser {
     blackoutCombo: BlackoutCombo,
     kegSmash: KegSmash,
     tigerPalm: TigerPalm,
-    rjw: RushingJadeWind,
     bof: BreathOfFire,
     bob: BlackOxBrew,
     highTolerance: HighTolerance,
@@ -103,9 +100,8 @@ class CombatLogParser extends CoreCombatLogParser {
     defensiveLinks: DefensiveBuffLinkNormalizer,
 
     // Items
-    stormstoutsLastKeg: StormtoutsLastKeg,
-    t29fourSet: BrewmasterT29FourSet,
-    callToDominance: CallToDominance,
+    WarWithinS1TierSet,
+    WarWithinS2TierSet,
 
     // normalizers
     gotoxNorm: GiftOfTheOx,
@@ -113,7 +109,6 @@ class CombatLogParser extends CoreCombatLogParser {
     staggerLink: StaggerLinkNormalizer,
     cbNorm: CelestialBrewNormalizer,
     bofNorm: BreathOfFireDebuffTargetNormalizer,
-    bdbNorm: BonedustBrewCastLinkNormalizer,
     sckNorm: SpinningCraneKickLinkNormalizer,
     ptaNorm: PressTheAdvantageNormalizer,
 
@@ -125,11 +120,12 @@ class CombatLogParser extends CoreCombatLogParser {
     quickSip: QuickSip,
     tranquilSpirit: TranquilSpirit,
     salsalabims: Salsalabims,
-    attenuation: Attenuation,
     anvilStave: AnvilStave,
     chiSurge: ChiSurge,
     pta: PressTheAdvantage,
-    bdb: BonedustBrew,
+    stormstoutsLastKeg: StormtoutsLastKeg,
+    veteransEye: VeteransEye,
+    efficientTraining: EfficientTraining,
 
     apl: AplCheck,
 

@@ -37,7 +37,7 @@ const spells = {
     id: 101546,
     name: 'Spinning Crane Kick',
     icon: 'ability_monk_cranekick_new',
-    manaCost: 2500,
+    manaCost: 25000,
   },
   SPINNING_CRANE_KICK_DAMAGE: {
     id: 107270,
@@ -95,8 +95,13 @@ const spells = {
     name: 'Healing Winds',
     icon: 'ability_monk_pathofmists',
   },
+  CELESTIAL_CONDUIT_DAMAGE: {
+    id: 443038,
+    name: 'Celestial Conduit',
+    icon: 'inv_ability_conduitofthecelestialsmonk_celestialconduit',
+  },
   CELESTIAL_CONDUIT_HEAL: {
-    id: 443029,
+    id: 443039,
     name: 'Celestial Conduit',
     icon: 'inv_ability_conduitofthecelestialsmonk_celestialconduit',
   },
@@ -140,7 +145,31 @@ const spells = {
     name: 'Flight of the Red Crane',
     icon: 'inv_pet_cranegod',
   },
-
+  HEART_OF_THE_JADE_SERPENT_STACK_WW: {
+    id: 443424,
+    name: 'Heart of the Jade Serpent',
+    icon: 'ability_monk_chiswirl',
+  },
+  HEART_OF_THE_JADE_SERPENT_STACK_MW: {
+    id: 443506,
+    name: 'Heart of the Jade Serpent',
+    icon: 'ability_monk_chiswirl',
+  },
+  HEART_OF_THE_JADE_SERPENT_UNITY: {
+    id: 443616,
+    name: 'Heart of the Jade Serpent',
+    icon: 'ability_monk_summonserpentstatue',
+  },
+  HEART_OF_THE_JADE_SERPENT_BUFF: {
+    id: 443421,
+    name: 'Heart of the Jade Serpent',
+    icon: 'ability_monk_summonserpentstatue',
+  },
+  UNITY_WITHIN_CAST: {
+    id: 443591,
+    name: 'Unity WIthin',
+    icon: 'ability_monk_prideofthetiger',
+  },
   // Mistweaver Monk Spells
   ENVELOPING_MIST_TFT: {
     id: 274062,
@@ -176,16 +205,21 @@ const spells = {
     id: 116670,
     name: 'Vivify',
     icon: 'ability_monk_vivify',
-    manaCost: 8500,
+    manaCost: 75000,
   },
   VIVIFICATION_BUFF: {
     id: 392883,
     name: 'Vivifacious Vivification',
     icon: 'ability_monk_vivify',
   },
-  AT_BUFF: {
+  MENDING_PROLIFERATION_BUFF: {
+    id: 388510,
+    name: 'Mending Proliferation',
+    icon: 'inv_shoulder_inv_leather_raidmonk_s_01',
+  },
+  JT_BUFF: {
     id: 388026,
-    name: 'Ancient Teachings',
+    name: 'Jadefire Teachings',
     icon: 'inv_misc_book_07',
   },
   AT_HEAL: {
@@ -272,7 +306,7 @@ const spells = {
     id: 115450,
     name: 'Detox',
     icon: 'ability_rogue_imrovedrecuperate',
-    manaCost: 650,
+    manaCost: 32500,
   },
 
   // Talents
@@ -300,6 +334,16 @@ const spells = {
     id: 130654,
     name: 'Chi Burst',
     icon: 'spell_arcane_arcanetorrent',
+  },
+  CHI_BURST_PROC: {
+    id: 460490,
+    name: 'Chi Burst',
+    icon: 'spell_arcane_arcanetorrent',
+  },
+  FLURRY_STRIKES_DAMAGE: {
+    id: 450615,
+    name: 'Flurry Strikes',
+    icon: 'inv-ability-shadopanmonk-flurrystrikes',
   },
   LIFECYCLES_VIVIFY_BUFF: {
     id: 197916,
@@ -386,6 +430,11 @@ const spells = {
     name: 'Refreshing Jade Wind',
     icon: 'ability_monk_rushingjadewind',
   },
+  REFRESHING_JADE_WIND_BUFF: {
+    id: 196725,
+    name: 'Refreshing Jade Wind',
+    icon: 'ability_monk_rushingjadewind',
+  },
   INVOKE_CHIJI_THE_RED_CRANE_BUFF: {
     id: 343820,
     name: 'Invoke Chi-Ji, the Red Crane',
@@ -396,12 +445,12 @@ const spells = {
     name: "Invoke Yu'lon, the Jade Serpent",
     icon: 'ability_monk_dragonkick',
   },
-  CHI_COCOON_HEAL_CHIIJI: {
+  CHI_COCOON_BUFF_CHIJI: {
     id: 406220,
     name: 'Chi Cocoon',
     icon: 'inv_pet_crane',
   },
-  CHI_COCOON_HEAL_YULON: {
+  CHI_COCOON_BUFF_YULON: {
     id: 406139,
     name: 'Chi Cocoon',
     icon: 'ability_monk_chiexplosion',
@@ -421,8 +470,13 @@ const spells = {
     name: 'Uplifted Spirits',
     icon: 'monk_stance_wiseserpent',
   },
-  WHIRLING_DRAGON_PUNCH_TALENT: {
+  WHIRLING_DRAGON_PUNCH_DAMAGE: {
     id: 158221,
+    name: 'Whirling Dragon Punch',
+    icon: 'ability_monk_hurricanestrike',
+  },
+  WHIRLING_DRAGON_PUNCH_USABLE: {
+    id: 196742,
     name: 'Whirling Dragon Punch',
     icon: 'ability_monk_hurricanestrike',
   },
@@ -456,11 +510,6 @@ const spells = {
     name: 'Faeline Stomp',
     icon: 'ability_ardenweald_monk',
   },
-  NOURISHING_CHI_BUFF: {
-    id: 387766,
-    name: 'Nourishing Chi',
-    icon: 'inv_misc_gem_pearl_06',
-  },
   CALMING_COALESCENCE_BUFF: {
     id: 388220,
     name: 'Calming Coalescence',
@@ -476,11 +525,21 @@ const spells = {
     name: 'Overflowing Mists',
     icon: 'inv_legion_faction_dreamweavers',
   },
-  //Invigorating Mist Heal
   INVIGORATING_MISTS_HEAL: {
     id: 425804,
     name: 'Invigorating Mists',
     icon: 'ability_monk_vivify',
+  },
+  // Tier
+  INSURANCE_HOT_MONK: {
+    id: 1215544,
+    name: 'Insurance',
+    icon: 'inv_10_inscription2_scroll2_color5',
+  },
+  INSURANCE_PROC_MONK: {
+    id: 1215545,
+    name: 'Insurance',
+    icon: 'inv_10_inscription2_scroll2_color5',
   },
   // Brewmaster
   NIUZAO_STOMP_DAMAGE: {
@@ -518,12 +577,12 @@ const spells = {
     name: 'Breath of Fire',
     icon: 'ability_monk_breathoffire',
   },
-  FORTIFYING_BREW_BRM: {
+  FORTIFYING_BREW_CAST: {
     id: 115203,
     name: 'Fortifying Brew',
     icon: 'ability_monk_fortifyingale_new',
   },
-  FORTIFYING_BREW_BRM_BUFF: {
+  FORTIFYING_BREW_BUFF: {
     id: 120954,
     name: 'Fortifying Brew',
     icon: 'ability_monk_fortifyingale_new',
@@ -800,6 +859,16 @@ const spells = {
     name: 'Rising Sun Kick',
     icon: 'ability_monk_risingsunkick',
   },
+  RUSHING_WIND_KICK_DAMAGE: {
+    id: 468179,
+    name: 'Rushing Wind Kick',
+    icon: 'ability_monk_ridethewind',
+  },
+  RUSHING_WINDS_BUFF: {
+    id: 467341,
+    name: 'Rushing Winds',
+    icon: 'ability_monk_ridethewind',
+  },
   HIT_COMBO_BUFF: {
     id: 196741,
     name: 'Hit Combo',
@@ -902,6 +971,40 @@ const spells = {
     id: 424454,
     name: 'Blackout Reinforcement',
     icon: 'inv_boots_cloth_19',
+  },
+  // TWW S1 Brewmaster 4-set
+  FLOW_OF_BATTLE_KS_BUFF: {
+    id: 457271,
+    name: 'Flow of Battle',
+    icon: 'ability_monk_energizingwine.jpg',
+  },
+  // TWW S2 Brewmaster 4-set
+  OPPORTUNISTIC_STRIKE_BUFF: {
+    id: 1217999,
+    name: 'Opportunistic Strike',
+    icon: '70_inscription_deck_dominion.jpg',
+  },
+  // Master of Harmony
+  ASPECT_OF_HARMONY_DOT: {
+    id: 450763,
+    name: 'Aspect of Harmony',
+    icon: 'inv-enchant-essencenethersmall',
+  },
+  ASPECT_OF_HARMONY_HOT: {
+    id: 450769,
+    name: 'Aspect of Harmony',
+    icon: 'inv_enchanting_wod_essence2',
+  },
+  ASPECT_OF_HARMONY_BUFF: {
+    id: 450711,
+    name: 'Aspect of Harmony',
+    icon: 'ability_evoker_essenceburst3',
+  },
+  // Shado-Pan
+  VETERANS_EYE_BUFF: {
+    id: 451085,
+    name: "Veteran's Eye",
+    icon: 'ability_monk_provoke.jpg',
   },
 } satisfies Record<string, Spell>;
 

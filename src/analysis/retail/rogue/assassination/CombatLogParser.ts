@@ -4,7 +4,6 @@ import {
   EnergyDetails,
   EnergyTracker,
   SpellEnergyCost,
-  StealthAbilityFollowingSepsis,
   ThistleTeaCastLinkNormalizer,
 } from 'analysis/retail/rogue/shared';
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
@@ -19,13 +18,11 @@ import GarroteUptimeAndSnapshots from './modules/spells/GarroteUptimeAndSnapshot
 import RuptureUptimeAndSnapshots from './modules/spells/RuptureUptimeAndSnapshots';
 import CrimsonTempestUptimeAndSnapshots from './modules/talents/CrimsonTempestUptimeAndSnapshots';
 import CastLinkNormalizer from './normalizers/CastLinkNormalizer';
-import SepsisLinkNormalizer from './normalizers/SepsisLinkNormalizer';
 import DotUptimesAndSnapshots from './modules/features/DotUptimesAndSnapshots';
 import BuilderUse from './modules/core/BuilderUse';
 import FinisherUse from './modules/core/FinisherUse';
 import HitCountAoE from './modules/core/HitCountAoE';
 import Envenom from './modules/spells/Envenom';
-import Sepsis from './modules/talents/Sepsis';
 import ThistleTea from './modules/talents/ThistleTea';
 import Guide from './Guide';
 import Mutilate from './modules/spells/Mutilate';
@@ -44,7 +41,6 @@ class CombatLogParser extends CoreCombatLogParser {
     // Normalizers
     castLinkNormalizer: CastLinkNormalizer,
     thistleTeaCastLinkNormalizer: ThistleTeaCastLinkNormalizer,
-    sepsisLinkNormalizer: SepsisLinkNormalizer,
     mutilateVanishLinkNormalizer: MutilateVanishLinkNormalizer,
     kingsbaneNormalizer: KingsbaneLinkNormalizer,
     blindsideEventOrderNormalizer: BlindsideEventOrderNormalizer,
@@ -63,7 +59,6 @@ class CombatLogParser extends CoreCombatLogParser {
     finisherUse: FinisherUse,
     hitCountAoe: HitCountAoE,
     dotUptimesAndSnapshots: DotUptimesAndSnapshots,
-    stealthAbilityFollowingSepsis: StealthAbilityFollowingSepsis,
 
     // Spells
     garroteUptimeAndSnapshots: GarroteUptimeAndSnapshots,
@@ -73,7 +68,6 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Talents
     crimsonTempestUptimeAndSnapshots: CrimsonTempestUptimeAndSnapshots,
-    sepsis: Sepsis,
     thistleTea: ThistleTea,
     kingsbane: Kingsbane,
 

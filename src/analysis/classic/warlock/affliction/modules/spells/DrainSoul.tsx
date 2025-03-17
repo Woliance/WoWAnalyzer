@@ -73,12 +73,11 @@ class DrainSoul extends Analyzer {
   }
 
   statistic() {
-    const ds = this.abilityTracker.getAbility(SPELLS.DRAIN_SOUL.id);
-    const damage = ds.damageEffective + ds.damageAbsorbed;
+    const damage = this.abilityTracker.getAbilityDamage(SPELLS.DRAIN_SOUL.id);
     const dps = (damage / this.owner.fightDuration) * 1000;
     return (
       <Statistic
-        category={STATISTIC_CATEGORY.TALENTS}
+        category={STATISTIC_CATEGORY.GENERAL}
         size="flexible"
         tooltip={`${formatThousands(damage)} total damage`}
       >

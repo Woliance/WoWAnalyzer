@@ -10,6 +10,7 @@ import HealingDone from 'parser/shared/modules/throughput/HealingDone';
 import { SpellbookAbility } from '../modules/Ability';
 import ManaTracker from './ManaTracker';
 import { maybeGetTalentOrSpell } from 'common/maybeGetTalentOrSpell';
+import { wclGameVersionToExpansion } from 'game/VERSIONS';
 
 export interface SpellInfoDetails {
   spell: Spell;
@@ -19,7 +20,6 @@ export interface SpellInfoDetails {
   overhealingDone: number;
   damageHits: number;
   damageDone: number;
-  damageAbsorbed: number;
   manaSpent: number;
   manaGained: ManaTracker;
   percentOverhealingDone: number;
@@ -53,14 +53,16 @@ class HealingEfficiencyTracker extends Analyzer {
 
   getSpellStats(spellId: number, healingSpellIds: number[] | null = null) {
     let spellInfo: SpellInfoDetails = {
-      spell: maybeGetTalentOrSpell(spellId)!,
+      spell: maybeGetTalentOrSpell(
+        spellId,
+        wclGameVersionToExpansion(this.owner.report.gameVersion),
+      )!,
       casts: 0,
       healingHits: 0,
       healingDone: 0,
       overhealingDone: 0,
       damageHits: 0,
       damageDone: 0,
-      damageAbsorbed: 0,
       manaSpent: 0,
       manaGained: this.manaTracker,
       percentOverhealingDone: 0,
@@ -79,23 +81,21 @@ class HealingEfficiencyTracker extends Analyzer {
 
     spellInfo.casts = ability.casts || 0;
     spellInfo.healingHits = ability.healingHits || 0;
-    spellInfo.healingDone = (ability.healingEffective || 0) + (ability.healingAbsorbed || 0);
-    spellInfo.overhealingDone = ability.healingOverheal || 0;
+    spellInfo.healingDone = ability.healingVal.effective;
+    spellInfo.overhealingDone = ability.healingVal.overheal;
 
     if (healingSpellIds) {
       for (const healingSpellId of healingSpellIds) {
         const healingAbility = this.abilityTracker.getAbility(healingSpellId);
 
         spellInfo.healingHits += healingAbility.healingHits || 0;
-        spellInfo.healingDone +=
-          (healingAbility.healingEffective || 0) + (healingAbility.healingAbsorbed || 0);
-        spellInfo.overhealingDone += healingAbility.healingOverheal || 0;
+        spellInfo.healingDone += healingAbility.healingVal.effective;
+        spellInfo.overhealingDone += healingAbility.healingVal.overheal;
       }
     }
 
     spellInfo.damageHits = ability.damageHits || 0;
-    spellInfo.damageDone = ability.damageEffective || 0;
-    spellInfo.damageAbsorbed = ability.damageAbsorbed || 0;
+    spellInfo.damageDone = ability.damageVal.effective;
 
     const spenders = this.manaTracker.spendersObj as {
       [spellId: number]: {
@@ -115,8 +115,8 @@ class HealingEfficiencyTracker extends Analyzer {
 
     spellInfo.percentOverhealingDone =
       spellInfo.overhealingDone / ((spellInfo.healingDone || 0) + spellInfo.overhealingDone) || 0;
-    spellInfo.percentHealingDone = spellInfo.healingDone / this.healingDone.total.regular || 0;
-    spellInfo.percentDamageDone = spellInfo.damageDone / this.damageDone.total.regular || 0;
+    spellInfo.percentHealingDone = spellInfo.healingDone / this.healingDone.total.effective || 0;
+    spellInfo.percentDamageDone = spellInfo.damageDone / this.damageDone.total.effective || 0;
     spellInfo.manaPercentSpent = spellInfo.manaSpent / this.manaTracker.spent;
 
     spellInfo.hpm = spellInfo.healingDone / spellInfo.manaSpent || 0;

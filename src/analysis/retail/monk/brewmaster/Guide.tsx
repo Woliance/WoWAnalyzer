@@ -6,35 +6,23 @@ import CombatLogParser from './CombatLogParser';
 import { GuideProps, Section, SubSection } from 'interface/guide';
 import { PurifySection } from './modules/problems/PurifyingBrew';
 import talents from 'common/TALENTS/monk';
-import * as AplCheck from './modules/core/AplCheck';
-import { AplSectionData } from 'interface/guide/components/Apl';
+
 import { ImprovedInvokeNiuzaoSection } from './modules/problems/InvokeNiuzao';
 import MajorDefensivesSection from './modules/core/MajorDefensives';
-import { defaultExplainers } from 'interface/guide/components/Apl/violations/claims';
-import explainSCK, { filterSCK } from './modules/core/AplCheck/explainSCK';
 import AplChoiceDescription from './modules/core/AplCheck/AplChoiceDescription';
 import CastEfficiencyBar from 'parser/ui/CastEfficiencyBar';
 import { GapHighlight } from 'parser/ui/CooldownBar';
 import Explanation from 'interface/guide/components/Explanation';
 import { Highlight } from 'interface/Highlight';
 import BlackoutComboSection from './modules/spells/BlackoutCombo/BlackoutComboSection';
-import BrewAplSummary from './modules/core/AplCheck/BrewAplSummary';
-import * as explainSpendCooldowns from './modules/core/AplCheck/explainSpendCooldowns';
-import ActiveTimeGraph from 'parser/ui/ActiveTimeGraph';
-import { formatPercentage } from 'common/format';
-import PerformanceStrong from 'interface/PerformanceStrong';
-
-const explainers = {
-  explainSCK,
-  explainTPSpam: explainSpendCooldowns.tigerPalmSpamExplanation,
-  overcast: defaultExplainers.overcastFillers,
-  // rethinking the lack of explainer priority here. we want to show custom text explaining the change to SCK, but doing so requires post-processing of the droppedRule results
-  dropped: explainSpendCooldowns.filterDropped(filterSCK(defaultExplainers.droppedRule)),
-};
+import { FoundationDowntimeSection } from 'interface/guide/foundation/FoundationDowntimeSection';
 
 export default function Guide({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
   return (
     <>
+      <Section title="Core Skills">
+        <FoundationDowntimeSection />
+      </Section>
       <Section title="Stagger Management">
         <p>
           Brewmaster's core defensive loop uses <SpellLink spell={SPELLS.STAGGER} /> plus{' '}
@@ -53,49 +41,7 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
       </Section>
       <MajorDefensivesSection />
       <Section title="Core Rotation">
-        <AplChoiceDescription aplChoice={AplCheck.chooseApl(info)} />
-        <SubSection>
-          <AplSectionData
-            checker={AplCheck.check}
-            summary={BrewAplSummary}
-            apl={AplCheck.apl(info)}
-            violationExplainers={explainers}
-          />
-        </SubSection>
-        <SubSection title="Always Be Casting">
-          <Explanation>
-            <p>
-              Brewmaster is currently a high-APM spec, with the ability to use an ability every time
-              your global cooldown (GCD) ends. The only talent that changes this is{' '}
-              <SpellLink spell={talents.PRESS_THE_ADVANTAGE_TALENT} />, which introduces downtime
-              where you would otherwise press <SpellLink spell={SPELLS.TIGER_PALM} /> in
-              single-target. However, even with{' '}
-              <SpellLink spell={talents.PRESS_THE_ADVANTAGE_TALENT}>PtA</SpellLink>, you can still
-              fill <em>almost</em> every GCD with an ability.
-            </p>
-            <p>
-              It is better for you to use an ability&mdash;<em>any</em> ability&mdash;each GCD than
-              to think carefully about each button press and have gaps between ability uses. You
-              should <strong>Always Be Casting</strong>. With practice, you will be able to fill
-              every GCD <em>and</em> while using the correct ability in each global.
-            </p>
-            <p>
-              The chart below should generally be near <strong>100%</strong> during periods where
-              you are able to attack the boss.
-            </p>
-          </Explanation>
-          <p>
-            Active Time:{' '}
-            <PerformanceStrong performance={modules.alwaysBeCasting.DowntimePerformance}>
-              {formatPercentage(modules.alwaysBeCasting.activeTimePercentage, 1)}%
-            </PerformanceStrong>
-          </p>
-          <ActiveTimeGraph
-            activeTimeSegments={modules.alwaysBeCasting.activeTimeSegments}
-            fightStart={info.fightStart}
-            fightEnd={info.fightEnd}
-          />
-        </SubSection>
+        <AplChoiceDescription />
         <BlackoutComboSection />
         <SubSection title="Major Cooldowns">
           <Explanation>
@@ -129,23 +75,9 @@ export default function Guide({ modules, events, info }: GuideProps<typeof Comba
               useThresholds
             />
           )}
-          {info.combatant.hasTalent(talents.BONEDUST_BREW_TALENT) && (
-            <CastEfficiencyBar
-              spellId={talents.BONEDUST_BREW_TALENT.id}
-              gapHighlightMode={GapHighlight.FullCooldown}
-              useThresholds
-            />
-          )}{' '}
           {info.combatant.hasTalent(talents.EXPLODING_KEG_TALENT) && (
             <CastEfficiencyBar
               spellId={talents.EXPLODING_KEG_TALENT.id}
-              gapHighlightMode={GapHighlight.FullCooldown}
-              useThresholds
-            />
-          )}
-          {info.combatant.hasTalent(talents.SUMMON_WHITE_TIGER_STATUE_TALENT) && (
-            <CastEfficiencyBar
-              spellId={talents.SUMMON_WHITE_TIGER_STATUE_TALENT.id}
               gapHighlightMode={GapHighlight.FullCooldown}
               useThresholds
             />

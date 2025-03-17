@@ -19,14 +19,13 @@ import MasteryEffectiveness from './modules/features/MasteryEffectiveness';
 import SpellUsable from './modules/features/SpellUsable';
 import TidalWaves from './modules/features/TidalWaves';
 // Talents
-import PrimordialWave from './modules/talents/PrimordialWave';
 import ChainHeal from './modules/spells/ChainHeal';
 import EarthShield from './modules/spells/EarthShield'; // technically shared
 import HealingRain from './modules/spells/HealingRain';
 import HealingSurge from './modules/spells/HealingSurge';
 import HealingWave from './modules/spells/HealingWave';
 import LavaSurge from './modules/spells/LavaSurge';
-import ManaTideTotem from './modules/spells/ManaTideTotem';
+
 import Resurgence from './modules/spells/Resurgence';
 import SpiritLinkDamageReduction from './modules/spells/SpiritLinkDamageReduction';
 import WaterShield from './modules/spells/WaterShield';
@@ -37,17 +36,31 @@ import CloudburstTotem from './modules/talents/CloudburstTotem';
 import Deluge from './modules/talents/Deluge';
 import Downpour from './modules/talents/Downpour';
 import EarthenWallTotem from './modules/talents/EarthenWallTotem';
-import FlashFlood from './modules/talents/FlashFlood';
 import HighTide from './modules/talents/HighTide';
 import NaturesGuardian from './modules/talents/NaturesGuardian';
-import TalentStatisticBox from './modules/features/TalentStatisticBox';
 import Torrent from './modules/talents/Torrent';
 import Undulation from './modules/talents/Undulation';
 import UnleashLife from './modules/talents/UnleashLife';
 import Wellspring from './modules/talents/Wellspring';
 import Undercurrent from './modules/talents/Undercurrent';
+import NaturesSwiftness from './modules/talents/NaturesSwiftness';
+import SpiritwalkersTidalTotem from './modules/talents/SpiritwalkersTidalTotem';
+import WhiteWater from './modules/talents/WhiteWater';
+import CoalescingWater from './modules/talents/CoalescingWater';
+// Hero talents
+import SurgingTotem from './modules/talents/totemic/SurgingTotem';
+import LivelyTotems from './modules/talents/totemic/LivelyTotems';
+import TotemicRebound from './modules/talents/totemic/TotemicRebound';
+import AmplificationCore from './modules/talents/totemic/AmplificationCore';
+import Oversurge from './modules/talents/totemic/Oversurge';
+import Reactivity from './modules/talents/totemic/Reactivity';
+import ImbuementMastery from './modules/talents/totemic/ImbuementMastery';
 // Spells
+// Tiers
+import TWW1TierSet from './modules/tier/TWW1TierSet';
 // Shared
+import StoneBulwarkTotem from '../shared/talents/StoneBulwarkTotem';
+
 // Normalizers
 import CloudburstNormalizer from './normalizers/CloudburstNormalizer';
 import RiptideNormalizer from './normalizers/RiptideNormalizer';
@@ -63,14 +76,10 @@ import FlowOfTheTides from './modules/talents/FlowOfTheTides';
 import EarthShieldBreakdown from './modules/features/EarthShieldBreakdown';
 import EarthenHarmony from './modules/talents/EarthenHarmony';
 import ElementalOrbit from '../shared/talents/ElementalOrbit';
-import SurgingShields from '../shared/talents/SurgingShields';
-import Tier30 from './modules/dragonflight/Tier30';
-import Tier30Normalizer from './normalizers/Tier30Normalizer';
-import Tier31 from './modules/dragonflight/Tier31';
 import Guide from './Guide';
 import Riptide from './modules/talents/Riptide';
-import CallToDominance from 'parser/retail/modules/items/dragonflight/CallToDominance';
 import ManaSpring from 'analysis/retail/shaman/shared/talents/ManaSpring';
+import SurgingTotemPrePullNormalizer from 'analysis/retail/shaman/restoration/normalizers/SurgingTotemPrePullNormalizer';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -102,7 +111,6 @@ class CombatLogParser extends CoreCombatLogParser {
     unleashLife: UnleashLife,
     undulation: Undulation,
     deluge: Deluge,
-    flashFlood: FlashFlood,
     ancestralVigor: AncestralVigor,
     earthenWallTotem: EarthenWallTotem,
     downpour: Downpour,
@@ -112,8 +120,6 @@ class CombatLogParser extends CoreCombatLogParser {
     highTide: HighTide,
     naturesGuardian: NaturesGuardian,
     ancestralProtectionTotem: AncestralProtectionTotem,
-    talentStatisticBox: TalentStatisticBox,
-    primordialWave: PrimordialWave,
     undercurrent: Undercurrent,
     primalTideCore: PrimalTideCore,
     wavespeakersBlessing: WavespeakersBlessing,
@@ -121,6 +127,19 @@ class CombatLogParser extends CoreCombatLogParser {
     flowOfTheTides: FlowOfTheTides,
     earthenHarmony: EarthenHarmony,
     manaSpring: ManaSpring,
+    naturesSwiftness: NaturesSwiftness,
+    spiritwalkersTidalTotem: SpiritwalkersTidalTotem,
+    whiteWater: WhiteWater,
+    coalescingWater: CoalescingWater,
+
+    // Hero talents
+    surgingTotem: SurgingTotem,
+    livelyTotems: LivelyTotems,
+    totemicRebound: TotemicRebound,
+    amplificationCore: AmplificationCore,
+    oversurge: Oversurge,
+    reactivity: Reactivity,
+    imbuementMastery: ImbuementMastery,
 
     // Spells
     riptide: Riptide,
@@ -130,7 +149,7 @@ class CombatLogParser extends CoreCombatLogParser {
     healingWave: HealingWave,
     lavaSurge: LavaSurge,
     resurgence: Resurgence,
-    manaTideTotem: ManaTideTotem,
+
     waterShield: WaterShield,
     spiritLinkDamageReduction: SpiritLinkDamageReduction,
 
@@ -140,9 +159,10 @@ class CombatLogParser extends CoreCombatLogParser {
     astralShift: AstralShift,
     earthShield: EarthShield,
     elementalOrbit: ElementalOrbit,
-    surgingShields: SurgingShields,
+    stoneBulwarkTotem: StoneBulwarkTotem,
 
     // Normalizers
+    surgingTotemPrePullNormalizer: SurgingTotemPrePullNormalizer,
     cloudburstNormalizer: CloudburstNormalizer,
     riptideNormalizer: RiptideNormalizer,
     castLinkNormalizer: CastLinkNormalizer,
@@ -152,10 +172,7 @@ class CombatLogParser extends CoreCombatLogParser {
     riptideAttributor: RiptideAttributor,
 
     // Items
-    tier30: Tier30,
-    tier30Normalizer: Tier30Normalizer,
-    callToDominance: CallToDominance,
-    tier31: Tier31,
+    tww1TierSet: TWW1TierSet,
   };
   static guide = Guide;
 }

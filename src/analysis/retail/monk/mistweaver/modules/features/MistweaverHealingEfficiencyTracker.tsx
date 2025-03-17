@@ -11,12 +11,15 @@ import RenewingMist from '../spells/RenewingMist';
 import SoothingMist from '../spells/SoothingMist';
 import Vivify from '../spells/Vivify';
 import RefreshingJadeWind from '../spells/RefreshingJadeWind';
-import AncientTeachings from '../spells/AncientTeachings';
+import JadefireTeachings from '../spells/JadefireTeachings';
 import RapidDiffusion from '../spells/RapidDiffusion';
 import DancingMists from '../spells/DancingMists';
 import MistyPeaks from '../spells/MistyPeaks';
 import RisingMist from '../spells/RisingMist';
 import ShaohaosLessons from '../spells/ShaohaosLessons';
+import CraneStyle from '../spells/CraneStyle';
+import ZenPulse from '../spells/ZenPulse';
+import TearOfMorning from '../spells/TearOfMorning';
 
 class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
   static dependencies = {
@@ -30,12 +33,15 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
     refreshingJadeWind: RefreshingJadeWind,
     expelHarm: ExpelHarm,
     jadefireStompHealing: JadefireStompHealing,
-    ancientTeachings: AncientTeachings,
+    jadefireTeachings: JadefireTeachings,
     rapidDiffusion: RapidDiffusion,
     dancingMists: DancingMists,
     mistyPeaks: MistyPeaks,
     risingMist: RisingMist,
     shaohaosLessons: ShaohaosLessons,
+    craneStyle: CraneStyle,
+    zenPulse: ZenPulse,
+    tearOfMorning: TearOfMorning,
   };
 
   protected envelopingMists!: EnvelopingMists;
@@ -45,12 +51,15 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
   protected refreshingJadeWind!: RefreshingJadeWind;
   protected expelHarm!: ExpelHarm;
   protected jadefireStompHealing!: JadefireStompHealing;
-  protected ancientTeachings!: AncientTeachings;
+  protected jadefireTeachings!: JadefireTeachings;
   protected rapidDiffusion!: RapidDiffusion;
   protected dancingMists!: DancingMists;
   protected mistyPeaks!: MistyPeaks;
   protected risingMist!: RisingMist;
   protected shaohaosLessons!: ShaohaosLessons;
+  protected craneStyle!: CraneStyle;
+  protected zenPulse!: ZenPulse;
+  protected tearOfMorning!: TearOfMorning;
 
   getCustomSpellStats(spellInfo: SpellInfoDetails, spellId: number) {
     if (spellId === TALENTS_MONK.ENVELOPING_MIST_TALENT.id) {
@@ -64,7 +73,10 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
       spellInfo = this.getVivifyDetails(spellInfo);
     } else if (spellId === TALENTS_MONK.REFRESHING_JADE_WIND_TALENT.id) {
       spellInfo = this.getRefreshingJadeWindDetails(spellInfo);
-    } else if (spellId === TALENTS_MONK.RISING_SUN_KICK_TALENT.id) {
+    } else if (
+      spellId === TALENTS_MONK.RISING_SUN_KICK_TALENT.id ||
+      spellId === TALENTS_MONK.RUSHING_WIND_KICK_TALENT.id
+    ) {
       spellInfo = this.getRisingSunKickDetails(spellInfo);
     } else if (spellId === TALENTS_MONK.INVOKE_YULON_THE_JADE_SERPENT_TALENT.id) {
       spellInfo = this.getYulonDetails(spellInfo);
@@ -98,12 +110,10 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
       this.rapidDiffusion.mistyPeakHealingFromEnvRem +
       this.envelopingMists.gustsHealing +
       this.rapidDiffusion.remHealingFromEnv +
-      this.envelopingMists.healingIncrease;
-    // Enveloping breath part
-    spellInfo.healingDone += this.healingDone.byAbility(SPELLS.ENVELOPING_BREATH_HEAL.id).effective;
-    spellInfo.overhealingDone += this.healingDone.byAbility(
-      SPELLS.ENVELOPING_BREATH_HEAL.id,
-    ).overheal;
+      this.envelopingMists.healingIncrease +
+      this.tearOfMorning.tftCleaveHealing +
+      this.healingDone.byAbility(SPELLS.ENVELOPING_MIST_TFT.id).effective;
+
     return spellInfo;
   }
 
@@ -123,13 +133,20 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
   }
 
   getVivifyDetails(spellInfo: SpellInfoDetails) {
-    // As described in the ReM section, the ReM Vivify splashes need to be removed from the healing done.
     spellInfo.healingDone =
-      this.vivify.mainTargetHealing + this.vivify.cleaveHealing + this.vivify.gomHealing;
+      this.vivify.mainTargetHealing +
+      this.vivify.cleaveHealing +
+      this.vivify.gomHealing +
+      this.zenPulse.healing;
+
     spellInfo.overhealingDone =
       this.vivify.mainTargetOverhealing +
       this.vivify.cleaveOverhealing +
+      this.zenPulse.overhealing +
       this.vivify.gomOverhealing;
+
+    spellInfo.healingHits += this.vivify.cleaveHits;
+    spellInfo.healingHits += this.zenPulse.zenPulseHits;
     return spellInfo;
   }
 
@@ -140,19 +157,23 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
   }
 
   getRisingSunKickDetails(spellInfo: SpellInfoDetails) {
-    // Since I don't want messy code right now it will only give the rising mist healing not any of the other fun stuff it gives indirectly
     spellInfo.healingDone =
       this.risingMist.totalHealing +
       this.rapidDiffusion.remHealingFromRSK +
-      this.rapidDiffusion.mistyPeakHealingFromRskRem;
+      this.rapidDiffusion.mistyPeakHealingFromRskRem +
+      this.craneStyle.rskHealing;
     spellInfo.overhealingDone = this.healingDone.byAbility(SPELLS.RISING_MIST_HEAL.id).overheal;
     return spellInfo;
   }
 
   getYulonDetails(spellInfo: SpellInfoDetails) {
-    // Get all soothing breath and enveloping breath healing since its all bc of yu'lon
-    spellInfo.healingDone = this.healingDone.byAbility(SPELLS.SOOTHING_BREATH.id).effective;
-    spellInfo.overhealingDone = this.healingDone.byAbility(SPELLS.SOOTHING_BREATH.id).overheal;
+    const soob = this.healingDone.byAbility(SPELLS.SOOTHING_BREATH.id);
+    const chiCocoon = this.healingDone.byAbility(SPELLS.CHI_COCOON_BUFF_YULON.id);
+    const envBreath = this.healingDone.byAbility(SPELLS.ENVELOPING_BREATH_HEAL.id);
+
+    spellInfo.healingDone = soob.effective + chiCocoon.effective + envBreath.effective;
+    spellInfo.overhealingDone = envBreath.overheal + soob.overheal + chiCocoon.overheal;
+
     return spellInfo;
   }
 
@@ -175,9 +196,9 @@ class MistweaverHealingEfficiencyTracker extends HealingEfficiencyTracker {
 
   getJFSDetails(spellInfo: SpellInfoDetails) {
     spellInfo.healingDone = this.jadefireStompHealing.jfsHealing;
-    spellInfo.healingDone += this.ancientTeachings.totalHealing;
+    spellInfo.healingDone += this.jadefireTeachings.totalHealing;
     spellInfo.overhealingDone = this.jadefireStompHealing.jfsOverhealing;
-    spellInfo.overhealingDone += this.ancientTeachings.overhealing;
+    spellInfo.overhealingDone += this.jadefireTeachings.overhealing;
     return spellInfo;
   }
 

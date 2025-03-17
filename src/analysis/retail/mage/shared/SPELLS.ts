@@ -186,6 +186,11 @@ const spells = {
     name: 'Excess Frost',
     icon: 'spell_deathknight_iceboundfortitude',
   },
+  EXCESS_FIRE_BUFF: {
+    id: 438624,
+    name: 'Excess Fire',
+    icon: 'ability_mage_fierypayback',
+  },
   MANA_ADDICTION_BUFF_FIRE: {
     id: 449314,
     name: 'Mana Addiction',
@@ -205,6 +210,17 @@ const spells = {
     id: 451073,
     name: 'Glorious Incandescence',
     icon: 'spell_burningsoul',
+  },
+  ARCANE_ORB: {
+    id: 153626,
+    name: 'Arcane Orb',
+    icon: 'spell_mage_arcaneorb',
+    manaCost: 25000,
+  },
+  BURDEN_OF_POWER_BUFF: {
+    id: 451049,
+    name: 'Burden of Power',
+    icon: 'inv_ragnaros_heart',
   },
 } satisfies Record<string, Spell>;
 

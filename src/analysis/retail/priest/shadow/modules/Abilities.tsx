@@ -9,6 +9,7 @@ class Abilities extends CoreAbilities {
     return [
       //Voidbolt is added through Voidform module.
       //SW:D is added through Shadow Word: Death module
+      //VoidBlast is added through VoidBlast module.
       {
         spell: SPELLS.MIND_BLAST.id,
         category: SPELL_CATEGORY.ROTATIONAL,
@@ -58,7 +59,7 @@ class Abilities extends CoreAbilities {
           combatant.hasTalent(TALENTS.MIND_SPIKE_TALENT),
       },
       {
-        spell: TALENTS.SHADOW_CRASH_TALENT.id,
+        spell: TALENTS.SHADOW_CRASH_1_SHADOW_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         cooldown: 20,
         gcd: {
@@ -66,23 +67,24 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: false,
-          recommendedEfficiency: 0.4,
+          recommendedEfficiency: 0.1,
         },
-        enabled: combatant.hasTalent(TALENTS.SHADOW_CRASH_TALENT),
+        enabled: combatant.hasTalent(TALENTS.SHADOW_CRASH_1_SHADOW_TALENT),
         damageSpellIds: [SPELLS.SHADOW_CRASH_TALENT_DAMAGE.id],
       },
       {
-        spell: TALENTS.MINDGAMES_TALENT.id,
+        spell: TALENTS.SHADOW_CRASH_2_SHADOW_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 45,
+        cooldown: 20,
         gcd: {
           base: 1500,
         },
         castEfficiency: {
-          suggestion: true,
-          recommendedEfficiency: 0.6,
+          suggestion: false,
+          recommendedEfficiency: 0.1,
         },
-        enabled: combatant.hasTalent(TALENTS.MINDGAMES_TALENT),
+        enabled: combatant.hasTalent(TALENTS.SHADOW_CRASH_2_SHADOW_TALENT),
+        damageSpellIds: [SPELLS.SHADOW_CRASH_TALENT_DAMAGE.id],
       },
       {
         spell: SPELLS.SHADOW_WORD_PAIN.id,
@@ -112,7 +114,7 @@ class Abilities extends CoreAbilities {
       {
         spell: TALENTS.HALO_SHADOW_TALENT.id,
         category: SPELL_CATEGORY.ROTATIONAL,
-        cooldown: 40,
+        cooldown: 60,
         gcd: {
           base: 1500,
         },
@@ -176,7 +178,22 @@ class Abilities extends CoreAbilities {
         gcd: {
           base: 1500,
         },
-        enabled: combatant.hasTalent(TALENTS.MINDBENDER_SHADOW_TALENT),
+        enabled:
+          combatant.hasTalent(TALENTS.MINDBENDER_SHADOW_TALENT) &&
+          !combatant.hasTalent(TALENTS.VOIDWRAITH_TALENT),
+        castEfficiency: {
+          suggestion: true,
+          recommendedEfficiency: 0.9,
+        },
+      },
+      {
+        spell: SPELLS.SHADOW_PRIEST_VOIDWEAVER_VOIDWRAITH_CAST.id,
+        category: SPELL_CATEGORY.COOLDOWNS,
+        cooldown: 180 - (combatant.hasTalent(TALENTS.MINDBENDER_SHADOW_TALENT) ? 120 : 0), //mindbender reduces the CD of Voidwraith by 2 minutes
+        gcd: {
+          base: 1500,
+        },
+        enabled: combatant.hasTalent(TALENTS.VOIDWRAITH_TALENT),
         castEfficiency: {
           suggestion: true,
           recommendedEfficiency: 0.9,
@@ -208,7 +225,10 @@ class Abilities extends CoreAbilities {
           suggestion: true,
           recommendedEfficiency: 0.95,
         },
-        enabled: combatant.hasTalent(TALENTS.POWER_INFUSION_TALENT),
+        //With Twins of the Sun Priestess, PI is added through the TwinsOftheSunPriestess module
+        enabled:
+          combatant.hasTalent(TALENTS.POWER_INFUSION_TALENT) &&
+          !combatant.hasTalent(TALENTS.TWINS_OF_THE_SUN_PRIESTESS_TALENT),
       },
 
       // Utility

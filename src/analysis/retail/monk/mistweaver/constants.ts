@@ -1,5 +1,8 @@
 import SPELLS from 'common/SPELLS';
+import Spell from 'common/SPELLS/Spell';
 import { TALENTS_MONK } from 'common/TALENTS';
+import { Talent } from 'common/TALENTS/types';
+import Combatant from 'parser/core/Combatant';
 export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
   // Spells
   TALENTS_MONK.ENVELOPING_MIST_TALENT.id,
@@ -28,7 +31,7 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
   TALENTS_MONK.RESTORAL_TALENT.id,
 
   // Talents
-  TALENTS_MONK.CHI_BURST_TALENT.id,
+  TALENTS_MONK.CHI_BURST_SHARED_TALENT.id,
   SPELLS.CHI_BURST_HEAL.id,
   TALENTS_MONK.CHI_WAVE_TALENT.id,
   TALENTS_MONK.REFRESHING_JADE_WIND_TALENT.id,
@@ -49,6 +52,7 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
 export const THUNDER_FOCUS_TEA_SPELLS = [
   SPELLS.VIVIFY,
   TALENTS_MONK.RISING_SUN_KICK_TALENT,
+  TALENTS_MONK.RUSHING_WIND_KICK_TALENT,
   TALENTS_MONK.ENVELOPING_MIST_TALENT,
   TALENTS_MONK.RENEWING_MIST_TALENT,
   SPELLS.EXPEL_HARM,
@@ -61,12 +65,13 @@ export const ENV_BASE_DURATION = 6000;
 export const TFT_REM_EXTRA_DURATION = 10000;
 
 // Talent Constants
+export const RJW_MAX_DURATION = 25000;
 export const POOL_OF_MISTS_CDR = 1000;
 export const MISTWRAP = 1000;
 export const MISTY_PEAKS_DURATION = 2000;
 export const RISING_MIST = 2;
 export const LOTUS_INFUSION_DURATION = 2000;
-export const LOTUS_INFUSION_BOOST = 0.08;
+export const LOTUS_INFUSION_BOOST = 0.1;
 export const CHI_HARMONY_BOOST = 0.5;
 export const CHI_HARMONY_DURATION = 8000;
 export const LEGACY_OF_WISDOM_TARGETS = 2;
@@ -74,13 +79,14 @@ export const SHEILUNS_GIFT_TARGETS = 3;
 export const MAX_CHIJI_STACKS = 3;
 export const MANA_TEA_MAX_STACKS = 20;
 export const MANA_TEA_REDUCTION = 0.3;
-export const JADE_BOND_INC = 0.4;
-export const JADE_BOND_SOOB_INC = 3;
+export const JADE_BOND_INC = 0.2;
+export const JADE_BOND_SOOB_INC = 5;
 export const NOURISHING_CHI_INC = 0.2;
 export const DANCING_MIST_CHANCE = 0.08;
 export const RAPID_DIFFUSION_DURATION = 3000; // per rank
 export const RISING_MIST_EXTENSION = 4000;
 export const ENVELOPING_MIST_INCREASE = 0.3;
+export const ENVELOPING_BREATH_INCREASE = 0.1;
 export const MISTWRAP_INCREASE = 0.1;
 export const YULON_REDUCTION = 0.5;
 export const ANCIENT_ARTS_LEG_SWEEP = 5;
@@ -90,9 +96,14 @@ export const PEACE_AND_PROSPERITY_ROP = 5;
 export const VIVACIOUS_VIVIFICATION_BOOST = 0.2;
 export const ZEN_PULSE_INCREASE_PER_STACK = 0.06;
 export const ZEN_PULSE_MAX_HITS_FOR_BOOST = 5;
+export const TEAR_OF_MORNING_INVIG_INCREASE = 0.1;
+export const TEAR_OF_MORNING_ENV_INCREASE = 0.12;
+export const CALMING_COALESCENCE_INCREASE = 0.8;
+export const RUSHING_WIND_KICK_INCREASE = 1.5;
 
 export const ATTRIBUTION_STRINGS = {
   BOUNCED: 'Bounced',
+  JADE_BOND_ENVELOPING_MIST: 'Jade Bond Enveloping Mist',
   HARDCAST_ENVELOPING_MIST: 'Enveloping Mist Hardcast',
   MISTY_PEAKS_ENVELOPING_MIST: 'Enveloping Mist Misty Peaks Proc',
   HARDCAST_RENEWING_MIST: 'Renewing Mist Hardcast',
@@ -108,7 +119,7 @@ export const ATTRIBUTION_STRINGS = {
     RD_SOURCE_RSK: 'Rapid Diffusion Source - Rising Sun Kick',
     RD_SOURCE_ENV: 'Rapid Diffusion Source - Enveloping Mist',
   },
-  YULON: "Hardcast During Yu'lon",
+  YULON: "Yu'lon",
 };
 
 export const SECRET_INFUSION_BUFFS = [
@@ -147,3 +158,15 @@ export const SPELL_COLORS = {
   ALTERNATE_GUST_OF_MIST: '#7f7f7f',
   ZEN_PULSE: '#c6f4f5',
 };
+
+export function getCurrentRSKTalent(player: Combatant): Talent {
+  return player.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_TALENT)
+    ? TALENTS_MONK.RUSHING_WIND_KICK_TALENT
+    : TALENTS_MONK.RISING_SUN_KICK_TALENT;
+}
+
+export function getCurrentRSKTalentDamage(player: Combatant): Spell {
+  return player.hasTalent(TALENTS_MONK.RUSHING_WIND_KICK_TALENT)
+    ? SPELLS.RUSHING_WIND_KICK_DAMAGE
+    : SPELLS.RISING_SUN_KICK_DAMAGE;
+}

@@ -26,4 +26,28 @@ export const DARK_EVANGELISM_DAMAGE_PER_RANK = 0.01;
 export const MASTERMIND_CRIT_DAMAGE_PER_RANK = 0.2;
 export const MASTERMIND_CRIT_CHANCE_PER_RANK = 0.04;
 
-export const MANIPULATION_COOLDOWN_PER_RANK = 0.5;
+export const DARK_ASCENSION_MULTIPLIER = 0.2;
+
+export const ANCIENT_MADNESS_CRIT_INCREASE = 0.1; //Starts by giving 10% crit
+export const ANCEINT_MADNESS_CRIT_DECREASE_PER_SECOND = 0.005; //Reduces by 0.5% per second
+
+export const DISTORTED_REALITY_MULTIPLIER = 0.2;
+
+export const MIND_MELT_CRIT = 0.2; //per stack of buff
+
+export const VOID_TOUCHED_MULTIPLIER = 0.06;
+
+//VoidWeaver Constants
+export const INNER_QUIETUS_MULTIPLIER = 0.35;
+export const VOIDHEART_MULTIPLIER = 0.1;
+export const COLLAPSING_VOID_DEVOURING_PLAGUE_MULTIPLIER = 0.2;
+
+//Archon Constants
+export const ARCHON_RESONANT_ENERGY_MULTIPLIER = 0.02;
+export const ARCHON_PERFECTED_FORM_DARK_ASCENSION_MULTIPLIER = 0.12;
+export const ARCHON_PERFECTED_FORM_VOID_FORM_MULTIPLIER = 0.2;
+export const ARCHON_ENERGY_COMPRESSION_MULTIPLIER = 0.3;
+export const ARCHON_EMPOWERED_SURGES_MULTIPLIER = 0.6;
+export const ARCHON_CONCENTRATED_INFUSION_HASTE = 0.1;
+
+// import {  } from '../../constants';

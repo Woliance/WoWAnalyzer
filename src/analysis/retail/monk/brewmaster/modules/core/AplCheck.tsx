@@ -1,21 +1,13 @@
 import SPELLS from 'common/SPELLS';
 import { suggestion } from 'parser/core/Analyzer';
-import aplCheck, {
-  Apl,
-  build,
-  CheckResult,
-  Condition,
-  PlayerInfo,
-  Rule,
-  tenseAlt,
-} from 'parser/shared/metrics/apl';
+import aplCheck, { Apl, build, CheckResult, PlayerInfo, tenseAlt } from 'parser/shared/metrics/apl';
 import annotateTimeline from 'parser/shared/metrics/apl/annotate';
 import * as cnd from 'parser/shared/metrics/apl/conditions';
 import talents from 'common/TALENTS/monk';
-import { AnyEvent, GetRelatedEvents } from 'parser/core/Events';
+import { AnyEvent } from 'parser/core/Events';
 import { SpellLink } from 'interface';
-import { SCK_DAMAGE_LINK } from '../../normalizers/SpinningCraneKick';
-import { KS_DAMAGE, PTA_TRIGGER_BUFF } from '../talents/PressTheAdvantage/normalizer';
+
+const withCombo = cnd.buffPresent(SPELLS.BLACKOUT_COMBO_BUFF);
 
 const SCK_AOE = {
   spell: SPELLS.SPINNING_CRANE_KICK_BRM,
@@ -27,246 +19,70 @@ const SCK_AOE = {
   ),
 };
 
-const refreshRjw = {
-  spell: talents.RUSHING_JADE_WIND_TALENT,
-  condition: cnd.buffMissing(talents.RUSHING_JADE_WIND_TALENT, {
-    timeRemaining: 1500,
-    duration: 6000,
-    pandemicCap: 1.5,
-  }),
-};
-
-const applyRjw = {
-  spell: talents.RUSHING_JADE_WIND_TALENT,
-  condition: cnd.buffMissing(talents.RUSHING_JADE_WIND_TALENT),
-};
-
-const refreshChp: Rule = {
-  spell: talents.BREATH_OF_FIRE_TALENT,
-  condition: cnd.describe(
-    cnd.and(
-      cnd.hasTalent(talents.CHARRED_PASSIONS_TALENT),
-      cnd.buffMissing(SPELLS.CHARRED_PASSIONS_BUFF, {
-        timeRemaining: 2000,
-        duration: 8000,
-        pandemicCap: 1,
-      }),
+const standardApl = build([
+  SPELLS.BLACKOUT_KICK_BRM,
+  {
+    spell: [
+      talents.RISING_SUN_KICK_TALENT,
+      talents.CHI_BURST_SHARED_TALENT,
+      talents.RUSHING_JADE_WIND_BREWMASTER_TALENT,
+    ],
+    condition: cnd.optionalRule(
+      cnd.and(withCombo, cnd.spellCooldownRemaining(SPELLS.BLACKOUT_KICK_BRM, { atLeast: 1000 })),
     ),
-    (tense) => (
+    description: (
       <>
-        when <SpellLink spell={SPELLS.CHARRED_PASSIONS_BUFF} /> {tenseAlt(tense, 'is', 'was')}{' '}
-        missing or about to expire
+        (Optional) You can cast non-<SpellLink spell={SPELLS.BLACKOUT_COMBO_BUFF}>Combo</SpellLink>{' '}
+        abilities like <SpellLink spell={talents.RISING_SUN_KICK_TALENT} /> before spending{' '}
+        <SpellLink spell={SPELLS.BLACKOUT_COMBO_BUFF} /> if it won't delay{' '}
+        <SpellLink spell={SPELLS.BLACKOUT_KICK_BRM} />
       </>
     ),
-  ),
-};
-
-const EK_SCK: Rule = {
-  spell: SPELLS.SPINNING_CRANE_KICK_BRM,
-  condition: cnd.optionalRule(
-    cnd.debuffPresent(talents.EXPLODING_KEG_TALENT, {
-      targetLinkRelation: SCK_DAMAGE_LINK,
-    }),
-    <>
-      Use <SpellLink spell={SPELLS.SPINNING_CRANE_KICK_BRM} /> to trigger the bonus damage from{' '}
-      <SpellLink spell={talents.EXPLODING_KEG_TALENT} /> while the debuff is active.
-    </>,
-    true,
-  ),
-};
-
-const commonLowPrio = [
-  refreshRjw,
-  SCK_AOE,
-  SPELLS.TIGER_PALM,
-  talents.CHI_WAVE_TALENT,
-  talents.CHI_BURST_TALENT,
-  {
-    spell: SPELLS.SPINNING_CRANE_KICK_BRM,
-    condition: cnd.optionalRule(
-      cnd.describe(cnd.hasTalent(talents.PRESS_THE_ADVANTAGE_TALENT), (tense) => (
-        <>it {tenseAlt(tense, 'would', 'did')} not skip your next auto-attack</>
-      )),
-    ),
   },
-];
-
-const commonHighPrio = [EK_SCK];
-
-const chpSequenceCnd = cnd.describe(
-  cnd.and(
-    cnd.hasTalent(talents.CHARRED_PASSIONS_TALENT),
-    cnd.buffMissing(SPELLS.CHARRED_PASSIONS_BUFF, {
-      pandemicCap: 1,
-      duration: 8000,
-      timeRemaining: 4000,
-    }),
-  ),
-  () => (
-    <>
-      performing the{' '}
-      <strong>
-        Maintain <SpellLink spell={talents.CHARRED_PASSIONS_TALENT} />
-      </strong>{' '}
-      block
-    </>
-  ),
-);
-
-const chp_sequence = [
   {
     spell: SPELLS.TIGER_PALM,
-    condition: cnd.and(chpSequenceCnd, cnd.buffPresent(SPELLS.BLACKOUT_COMBO_BUFF)),
+    condition: withCombo,
   },
-  {
-    spell: talents.BREATH_OF_FIRE_TALENT,
-    condition: chpSequenceCnd,
-  },
-  {
-    spell: talents.KEG_SMASH_TALENT,
-    condition: chpSequenceCnd,
-  },
-];
-
-// this is fairly lax. could prioritize it a bit but not going to for now.
-export const dump_cd_rule: Rule = {
-  spell: [
-    talents.BONEDUST_BREW_TALENT,
-    talents.EXPLODING_KEG_TALENT,
-    talents.RISING_SUN_KICK_TALENT,
-    talents.RUSHING_JADE_WIND_TALENT,
-    talents.CHI_WAVE_TALENT,
-    talents.CHI_BURST_TALENT,
-  ],
-  description: (
-    <>
-      Spend cooldowns like <SpellLink spell={talents.RISING_SUN_KICK_TALENT} />,{' '}
-      <SpellLink spell={talents.RUSHING_JADE_WIND_TALENT} />,{' '}
-      <SpellLink spell={talents.BONEDUST_BREW_TALENT} />, or{' '}
-      <SpellLink spell={talents.WEAPONS_OF_ORDER_TALENT} />
-    </>
-  ),
-};
-
-const dump_cd_sequence: Rule[] = [
-  {
-    spell: SPELLS.TIGER_PALM,
-    condition: cnd.describe(
-      cnd.or(
-        cnd.optionalRule(cnd.buffPresent(SPELLS.BLACKOUT_COMBO_BUFF)),
-        cnd.and(
-          cnd.buffPresent(SPELLS.BLACKOUT_COMBO_BUFF),
-          cnd.spellCooldownRemaining(SPELLS.BLACKOUT_KICK_BRM, { atMost: 2000 }),
-        ),
-      ),
-      (tense) => (
-        <>
-          performing the <strong>Spend Cooldowns</strong> block and{' '}
-          <SpellLink spell={SPELLS.BLACKOUT_COMBO_BUFF} /> {tenseAlt(tense, 'is', 'was')} present
-        </>
-      ),
-    ),
-  },
-  dump_cd_rule,
-];
-
-const rotation_boc_tp = build([
+  talents.KEG_SMASH_TALENT,
   {
     spell: talents.BREATH_OF_FIRE_TALENT,
     condition: cnd.describe(
       cnd.and(
+        cnd.not(withCombo),
         cnd.hasTalent(talents.CHARRED_PASSIONS_TALENT),
+        cnd.hasTalent(talents.SALSALABIMS_STRENGTH_TALENT),
         cnd.buffMissing(SPELLS.CHARRED_PASSIONS_BUFF, {
-          pandemicCap: 1,
           duration: 8000,
-          timeRemaining: 0,
+          timeRemaining: 2000,
+          pandemicCap: 1,
         }),
-        cnd.spellCooldownRemaining(SPELLS.BLACKOUT_KICK_BRM, { atMost: 2000 }),
       ),
       (tense) => (
         <>
-          <SpellLink spell={talents.CHARRED_PASSIONS_TALENT} /> {tenseAlt(tense, 'is', 'was')}{' '}
-          missing before casting <SpellLink spell={SPELLS.BLACKOUT_KICK_BRM} />
+          you {tenseAlt(tense, 'are', 'were')} missing the{' '}
+          <SpellLink spell={SPELLS.CHARRED_PASSIONS_BUFF} /> buff
         </>
       ),
     ),
   },
-  SPELLS.BLACKOUT_KICK_BRM,
-  ...chp_sequence,
-  ...dump_cd_sequence,
-]);
-
-const spendPtaCondition: Condition<null> = {
-  key: 'pta-trigger',
-  init: () => null,
-  update: () => null,
-  describe: (tense) => (
-    <>
-      you {tenseAlt(tense, <>have</>, <>had</>)} 10 stacks of{' '}
-      <SpellLink spell={talents.PRESS_THE_ADVANTAGE_TALENT} />
-    </>
-  ),
-  validate: (_state, event, _spell) => {
-    return GetRelatedEvents(event, PTA_TRIGGER_BUFF).length > 0;
-  },
-};
-
-const rotation_other = build([
-  ...commonHighPrio,
-  {
-    spell: talents.KEG_SMASH_TALENT,
-    condition: cnd.describe(
-      cnd.and(spendPtaCondition, cnd.targetsHit({ atLeast: 2 }, { targetLinkRelation: KS_DAMAGE })),
-      (tense) => (
-        <>
-          you {tenseAlt(tense, <>have</>, <>had</>)} 10 stacks of{' '}
-          <SpellLink spell={talents.PRESS_THE_ADVANTAGE_TALENT} /> and{' '}
-          {tenseAlt(tense, 'hit', 'would hit')} multiple targets
-        </>
-      ),
-    ),
-  },
-  {
-    spell: talents.RISING_SUN_KICK_TALENT,
-    condition: spendPtaCondition,
-  },
-  refreshChp,
-  SPELLS.BLACKOUT_KICK_BRM,
   talents.RISING_SUN_KICK_TALENT,
-  applyRjw,
-  {
-    spell: talents.BREATH_OF_FIRE_TALENT,
-    condition: cnd.hasTalent(talents.DRAGONFIRE_BREW_TALENT),
-  },
-  talents.KEG_SMASH_TALENT,
+  talents.CHI_BURST_SHARED_TALENT,
   talents.BREATH_OF_FIRE_TALENT,
-  ...commonLowPrio,
+  talents.RUSHING_JADE_WIND_BREWMASTER_TALENT,
+  SCK_AOE,
+  SPELLS.TIGER_PALM,
 ]);
 
 export enum BrewmasterApl {
-  BoC_TP,
-  PTA,
-  Fallback,
+  Standard,
 }
 
 export const chooseApl = (info: PlayerInfo): BrewmasterApl => {
-  if (
-    info.combatant.hasTalent(talents.BLACKOUT_COMBO_TALENT) &&
-    info.combatant.hasTalent(talents.CHARRED_PASSIONS_TALENT) &&
-    !info.combatant.hasTalent(talents.PRESS_THE_ADVANTAGE_TALENT)
-  ) {
-    return BrewmasterApl.BoC_TP;
-  } else if (info.combatant.hasTalent(talents.PRESS_THE_ADVANTAGE_TALENT)) {
-    return BrewmasterApl.PTA;
-  } else {
-    return BrewmasterApl.Fallback;
-  }
+  return BrewmasterApl.Standard;
 };
 
 const apls: Record<BrewmasterApl, Apl> = {
-  [BrewmasterApl.BoC_TP]: rotation_boc_tp,
-  [BrewmasterApl.PTA]: rotation_other,
-  [BrewmasterApl.Fallback]: rotation_other,
+  [BrewmasterApl.Standard]: standardApl,
 };
 
 export const apl = (info: PlayerInfo): Apl => {

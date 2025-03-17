@@ -1,4 +1,3 @@
-import SPELLS from 'common/SPELLS';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import { Options } from 'parser/core/Module';
 import { TALENTS_MONK } from 'common/TALENTS';
@@ -30,7 +29,6 @@ import {
   REVIVAL_GOM,
   VIVIFY,
   SHEILUNS_GIFT,
-  CALMING_COALESCENCE,
   MANA_TEA_CHANNEL,
   MANA_TEA_CAST_LINK,
   MT_BUFF_REMOVAL,
@@ -50,12 +48,18 @@ import {
   VIVACIOUS_VIVIFICATION,
   ZEN_PULSE_CONSUME,
   ZEN_PULSE_VIVIFY,
+  STRENGTH_OF_THE_BLACK_OX,
+  JADE_BOND_ENVM,
+  INSURANCE_FROM_REM,
+  INSURANCE,
 } from './EventLinks/EventLinkConstants';
 import { RENEWING_MIST_EVENT_LINKS } from './EventLinks/RenewingMistEventLinks';
 import { GUST_OF_MISTS_EVENT_LINKS } from './EventLinks/GustOfMistEventLinks';
 import { MANA_TEA_EVENT_LINKS } from './EventLinks/ManaTeaEventLinks';
 import { VIVIFY_EVENT_LINKS } from './EventLinks/VivifyEventLinks';
 import { ENVELOPING_MIST_EVENT_LINKS } from './EventLinks/EnvelopingMistEventLinks';
+import { HERO_TALENT_EVENT_LINKS } from './EventLinks/HeroTalentEventLinks';
+import { TIER_EVENT_LINKS } from './EventLinks/TierEventLinks';
 
 const FOUND_REMS: Map<string, number | null> = new Map();
 
@@ -70,6 +74,8 @@ const EVENT_LINKS: EventLink[] = [
   ...MANA_TEA_EVENT_LINKS,
   ...VIVIFY_EVENT_LINKS,
   ...ENVELOPING_MIST_EVENT_LINKS,
+  ...HERO_TALENT_EVENT_LINKS,
+  ...TIER_EVENT_LINKS,
   {
     linkRelation: SHEILUNS_GIFT,
     linkingEventId: [TALENTS_MONK.SHEILUNS_GIFT_TALENT.id],
@@ -84,19 +90,6 @@ const EVENT_LINKS: EventLink[] = [
     },
     maximumLinks(c) {
       return c.hasTalent(TALENTS_MONK.LEGACY_OF_WISDOM_TALENT) ? 5 : 3;
-    },
-  },
-  {
-    linkRelation: CALMING_COALESCENCE,
-    linkingEventId: [SPELLS.CALMING_COALESCENCE_BUFF.id],
-    linkingEventType: [EventType.RemoveBuff],
-    referencedEventId: [TALENTS_MONK.LIFE_COCOON_TALENT.id],
-    referencedEventType: [EventType.Cast],
-    backwardBufferMs: CAST_BUFFER_MS,
-    forwardBufferMs: CAST_BUFFER_MS,
-    anyTarget: true,
-    isActive(c) {
-      return c.hasTalent(TALENTS_MONK.CALMING_COALESCENCE_TALENT);
     },
   },
 ];
@@ -176,6 +169,10 @@ export function isBounceTick(event: HealEvent) {
   return HasRelatedEvent(event, OVERHEAL_BOUNCE);
 }
 
+export function isFromJadeBond(event: ApplyBuffEvent | RefreshBuffEvent) {
+  return HasRelatedEvent(event, JADE_BOND_ENVM);
+}
+
 export function isFromMistyPeaks(event: ApplyBuffEvent | RefreshBuffEvent) {
   return HasRelatedEvent(event, FROM_MISTY_PEAKS);
 }
@@ -206,7 +203,8 @@ export function isFromRapidDiffusionRisingSunKick(event: ApplyBuffEvent | Refres
   const rdSourceEvent = GetRelatedEvent(event, FROM_RAPID_DIFFUSION)!;
   return (
     rdSourceEvent.type === EventType.Cast &&
-    rdSourceEvent.ability.guid === TALENTS_MONK.RISING_SUN_KICK_TALENT.id
+    (rdSourceEvent.ability.guid === TALENTS_MONK.RISING_SUN_KICK_TALENT.id ||
+      rdSourceEvent.ability.guid === TALENTS_MONK.RUSHING_WIND_KICK_TALENT.id)
   );
 }
 
@@ -274,10 +272,6 @@ export function isFromCraneStyleSCK(event: HealEvent) {
   return HasRelatedEvent(event, CRANE_STYLE_SCK);
 }
 
-export function isFromLifeCocoon(event: RemoveBuffEvent) {
-  return HasRelatedEvent(event, CALMING_COALESCENCE);
-}
-
 export function getSheilunsGiftHits(event: CastEvent): HealEvent[] {
   return GetRelatedEvents<HealEvent>(event, SHEILUNS_GIFT);
 }
@@ -291,8 +285,8 @@ export function isVivaciousVivification(event: HealEvent) {
   return GetRelatedEvent(event, VIVACIOUS_VIVIFICATION);
 }
 
-export function getZenPulseHitsPerCast(event: HealEvent) {
-  return GetRelatedEvents(event, ZEN_PULSE_VIVIFY);
+export function getZenPulseHitsPerCast(event: HealEvent): HealEvent[] {
+  return GetRelatedEvents<HealEvent>(event, ZEN_PULSE_VIVIFY);
 }
 
 export function isZenPulseConsumed(event: RemoveBuffEvent | RemoveBuffStackEvent) {
@@ -322,6 +316,24 @@ export function isMTStackFromLifeCycles(
 
 export function HasStackChange(event: RefreshBuffEvent): boolean {
   return HasRelatedEvent(event, MT_STACK_CHANGE);
+}
+
+// hero talents
+export function isStrengthOfTheBlackOxConsumed(event: RemoveBuffEvent): boolean {
+  return HasRelatedEvent(event, STRENGTH_OF_THE_BLACK_OX);
+}
+
+// tier
+export function isInsuranceFromHardcast(event: HealEvent) {
+  const source = GetRelatedEvent(event, INSURANCE);
+  if (!source) {
+    return false;
+  }
+  const remApply = GetRelatedEvent<RefreshBuffEvent | ApplyBuffEvent>(source, INSURANCE_FROM_REM);
+  if (!remApply) {
+    return false;
+  }
+  return isFromHardcast(remApply) || isFromRapidDiffusion(remApply);
 }
 
 export default CastLinkNormalizer;

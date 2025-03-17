@@ -18,17 +18,13 @@ import CancelledCasts from './modules/features/CancelledCasts';
 import SubOptimalChainLightning from './modules/features/SubOptimalChainLightning';
 import Aftershock from './modules/talents/Aftershock';
 import Ascendance from './modules/talents/Ascendance';
-import Icefury from './modules/talents/Icefury';
-import LiquidMagmaTotem from './modules/talents/LiquidMagmaTotem';
 import MasterOfTheElements from './modules/talents/MasterOfTheElements';
 import PrimalFireElemental from './modules/talents/PrimalFireElemental';
 import PrimalStormElemental from './modules/talents/PrimalStormElemental';
-import StormElemental from './modules/talents/StormElemental';
 import Stormkeeper from './modules/talents/Stormkeeper';
 import SurgeOfPower from './modules/talents/SurgeOfPower';
 import ElementalOrbit from '../shared/talents/ElementalOrbit';
 import EarthenHarmony from '../restoration/modules/talents/EarthenHarmony';
-import CallToDominance from 'parser/retail/modules/items/dragonflight/CallToDominance';
 import ManaSpring from 'analysis/retail/shaman/shared/talents/ManaSpring';
 import ElementalGuide from './guide/ElementalGuide';
 import SpellMaelstromCost from './modules/core/SpellMaelstromCost';
@@ -36,7 +32,20 @@ import SpenderWindow from './modules/features/SpenderWindow';
 import MaelstromTracker from './modules/resources/MaelstromTracker';
 import MaelstromDetails from './modules/resources/MaelstromDetails';
 import MaelstromGraph from './modules/resources/MaelstromGraph';
-import ElectrifiedShocks from './modules/talents/ElectrifiedShocks';
+import { StormbringerTab } from '../shared/hero/stormbringer/StormbringerTab';
+import Tempest from '../shared/hero/stormbringer/Tempest';
+import StormbringerEventOrderNormalizer from '../shared/hero/stormbringer/normalizers/StormbringerEventOrderNormalizer';
+import StormbringerEventLinkNormalizer from '../shared/hero/stormbringer/normalizers/StormbringerEventLinkNormalizer';
+import EventLinkNormalizer from './modules/normalizers/EventLinkNormalizer';
+import CallOfTheAncestors from './modules/hero/farseer/CallOfTheAncestors';
+import ElementalPrepullNormalizer from './modules/normalizers/ElementalPrepullNormalizer';
+import EventOrderNormalizer from './modules/normalizers/EventOrderNormalizer';
+import HeraldOfTheStorms from './modules/talents/HeraldOfTheStorms';
+import EchoesOfGreatSundering from './modules/talents/EchoesOfGreatSundering';
+import OfferingFromBeyond from './modules/hero/farseer/OfferingFromBeyond';
+import FusionOfElementsNormalizer from './modules/normalizers/FusionOfElementsNormalizer';
+import MaelstromSpenders from './modules/features/MaelstromSpenders';
+import FusionOfElements from './modules/talents/FusionOfElements';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -49,6 +58,12 @@ class CombatLogParser extends CoreCombatLogParser {
     alwaysBeCasting: AlwaysBeCasting,
     subOptimalChainLightning: SubOptimalChainLightning,
     spenderWindow: SpenderWindow,
+    maelstromSpenders: MaelstromSpenders,
+
+    eventLinkNormalizer: EventLinkNormalizer,
+    eventOrderNormalizer: EventOrderNormalizer,
+    elementalPrepullNormalizer: ElementalPrepullNormalizer,
+    fusionOfElementsNormalizer: FusionOfElementsNormalizer,
 
     // Talents
     aftershock: Aftershock,
@@ -59,16 +74,24 @@ class CombatLogParser extends CoreCombatLogParser {
     earthenHarmony: EarthenHarmony,
     staticCharge: StaticCharge,
     masterOfTheElements: MasterOfTheElements,
-    stormElemental: StormElemental,
-    liquidMagmaTotem: LiquidMagmaTotem,
     surgeOfPower: SurgeOfPower,
     primalFireElemental: PrimalFireElemental,
     primalStormElemental: PrimalStormElemental,
-    icefury: Icefury,
     stormkeeper: Stormkeeper,
     ascendance: Ascendance,
     manaSpring: ManaSpring,
-    electrifiedShocks: ElectrifiedShocks,
+    heraldOfTheStorms: HeraldOfTheStorms,
+    echoesOfGreatSundering: EchoesOfGreatSundering,
+    fusionOfElements: FusionOfElements,
+
+    // hero talents
+    stormbringerTab: StormbringerTab,
+    tempest: Tempest,
+    stormbringerEventOrderNormalizer: StormbringerEventOrderNormalizer,
+    stormbringerEventLinkNormalizer: StormbringerEventLinkNormalizer,
+
+    callOfTheAncestors: CallOfTheAncestors,
+    offeringFromBeyond: OfferingFromBeyond,
 
     maelstromTracker: MaelstromTracker,
     maelstromDetails: MaelstromDetails,
@@ -77,7 +100,6 @@ class CombatLogParser extends CoreCombatLogParser {
     ankhNormalizer: AnkhNormalizer,
     checklist: Checklist,
     astralShift: AstralShift,
-    callToDominance: CallToDominance,
   };
 
   static guide = ElementalGuide;

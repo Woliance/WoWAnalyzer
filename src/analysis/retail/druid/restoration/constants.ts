@@ -10,6 +10,30 @@ export const LIFEBLOOM_BUFFS: Spell[] = [
   SPELLS.LIFEBLOOM_UNDERGROWTH_HOT_HEAL,
 ];
 
+/** Given count of Druid HoTs on target, gets the multiplier against mastery val to apply */
+export function masteryHotCountToMult(hotsOn: number): number {
+  if (hotsOn > 10) {
+    return 3.65;
+  }
+  return MASTERY_HOT_COUNT_TO_MULT_TABLE[hotsOn];
+}
+const MASTERY_HOT_COUNT_TO_MULT_TABLE = [
+  0,
+  1,
+  1.7,
+  2.3,
+  2.8,
+  3.2,
+  3.5,
+  3.7,
+  3.8,
+  3.85,
+  3.65, // loses value here, probably a bug
+];
+
+/** Additional mastery stacks granted by Harmonius Blooming talent */
+export const HARMONIUS_BLOOMING_EXTRA_STACKS = 2;
+
 export function lifebloomSpell(c: Combatant): Spell {
   return c.hasTalent(TALENTS_DRUID.UNDERGROWTH_TALENT)
     ? SPELLS.LIFEBLOOM_UNDERGROWTH_HOT_HEAL
@@ -41,6 +65,11 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES: number[] = [
   SPELLS.NOURISH.id,
   SPELLS.T31_TREANT_CLEAVE_NOURISH.id,
   SPELLS.T31_CAST_CLEAVE_NOURISH.id,
+  SPELLS.THRIVING_VEGETATION.id,
+  SPELLS.SYMBIOTIC_BLOOMS_WILDSTALKER.id,
+  SPELLS.BURSTING_GROWTH_HEAL.id,
+  SPELLS.DREAM_BLOOM.id,
+  SPELLS.FLOWER_WALK.id,
 ];
 
 // procs Nature's Vigil
@@ -88,6 +117,7 @@ export const MASTERY_STACK_BUFF_IDS: number[] = [
   SPELLS.ADAPTIVE_SWARM_HEAL.id,
   SPELLS.RENEWING_BLOOM.id,
   SPELLS.GROVE_TENDING.id,
+  SPELLS.SYMBIOTIC_BLOOMS_WILDSTALKER.id,
 ];
 
 // HoTs that get rate increased by Flourish
@@ -111,7 +141,11 @@ export const PHOTO_INCREASED_RATE = [
   ...FLOURISH_INCREASED_RATE,
   SPELLS.SPRING_BLOSSOMS,
   SPELLS.EFFLORESCENCE_HEAL,
+  SPELLS.SYMBIOTIC_BLOOMS_WILDSTALKER,
 ];
+
+// HoTs that get rate increased by Liveliness
+export const LIVELINESS_INCREASED_RATE = PHOTO_INCREASED_RATE;
 
 //probably need to add natures vigil here as well and need to check if it reduces tranquility itself
 export const DRUID_COOLDOWNS = [

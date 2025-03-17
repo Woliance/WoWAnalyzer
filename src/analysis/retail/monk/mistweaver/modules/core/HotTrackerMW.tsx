@@ -36,6 +36,41 @@ class HotTrackerMW extends HotTracker {
     this.risingMistActive = this.owner.selectedCombatant.hasTalent(TALENTS_MONK.RISING_MIST_TALENT);
   }
 
+  getAverageHealingForAttribution(
+    spellId: number,
+    attribution: string,
+    excludeDancingMist: boolean = false,
+    filteredHistory?: Tracker[],
+  ): number {
+    if (!filteredHistory) {
+      filteredHistory = this.getHistoryForSpellAndAttribution(
+        spellId,
+        attribution,
+        excludeDancingMist,
+      );
+    }
+    return (
+      filteredHistory.filter((hot) =>
+        hot.attributions.filter((attr) => attr.name === attribution),
+      )[0]?.attributions[0].healing / filteredHistory.length
+    );
+  }
+
+  getHistoryForSpellAndAttribution(
+    spellId: number,
+    attribution: string,
+    excludeDancingMist: boolean,
+  ): Tracker[] {
+    return this.hotHistory.filter(
+      (tracker) =>
+        tracker.spellId === spellId &&
+        tracker.attributions.some((attr) => {
+          return attr.name === attribution;
+        }) &&
+        (excludeDancingMist ? !this.fromDancingMists(tracker) : true),
+    );
+  }
+
   /**
    * Checks if the target of the event currently has the specified HoT on them
    * @param event the healing event to check
@@ -77,6 +112,12 @@ class HotTrackerMW extends HotTracker {
     });
   }
 
+  fromJadeBond(hot: Tracker): boolean {
+    return hot.attributions.some(function (attr) {
+      return attr.name === ATTRIBUTION_STRINGS.JADE_BOND_ENVELOPING_MIST;
+    });
+  }
+
   fromMistyPeaks(hot: Tracker): boolean {
     return hot.attributions.some(function (attr) {
       return attr.name === ATTRIBUTION_STRINGS.MISTY_PEAKS_ENVELOPING_MIST;
@@ -110,12 +151,6 @@ class HotTrackerMW extends HotTracker {
   fromDancingMists(hot: Tracker): boolean {
     return hot.attributions.some(function (attr) {
       return attr.name === ATTRIBUTION_STRINGS.DANCING_MIST_RENEWING_MIST;
-    });
-  }
-
-  fromYuLon(hot: Tracker): boolean {
-    return hot.attributions.some(function (attr) {
-      return attr.name === ATTRIBUTION_STRINGS.YULON;
     });
   }
 

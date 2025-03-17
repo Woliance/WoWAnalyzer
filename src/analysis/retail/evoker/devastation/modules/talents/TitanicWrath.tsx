@@ -19,14 +19,15 @@ import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import {
   TITANIC_WRATH_MULTIPLIER,
-  DISINTEGRATE_CHAINED_TICKS,
-  DISINTEGRATE_TICKS,
+  GetDisintegrateTicks,
 } from 'analysis/retail/evoker/devastation/constants';
 import { SpellLink } from 'interface';
-import { ESSENCE_BURST_CONSUME } from '../normalizers/CastLinkNormalizer';
 import TalentSpellText from 'parser/ui/TalentSpellText';
+import { ESSENCE_BURST_CONSUME } from 'analysis/retail/evoker/shared/modules/normalizers/EssenceBurstCastLinkNormalizer';
 
 const { DISINTEGRATE, PYRE, ESSENCE_BURST_DEV_BUFF } = SPELLS;
+
+/** Essence Burst increases the damage of affected spells by 15.0%. */
 
 class TitanicWrath extends Analyzer {
   ticksToCount: number = 0;
@@ -34,17 +35,17 @@ class TitanicWrath extends Analyzer {
   titanicWrathDisintegrateDamage: number = 0;
   titanicWrathPyreDamage: number = 0;
 
-  titanicWrathMultiplier: number = 0;
   lastDamEvent: number = 0;
 
   trackDamage: boolean = false;
   trackedSpells = [DISINTEGRATE, PYRE];
 
+  ticksPerDisintegrate = 0;
+  ticksPerChainedDisintegrate = 0;
+
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS.TITANIC_WRATH_TALENT);
-    const ranks = this.selectedCombatant.getTalentRank(TALENTS.TITANIC_WRATH_TALENT);
-    this.titanicWrathMultiplier = TITANIC_WRATH_MULTIPLIER * ranks;
 
     this.addEventListener(Events.damage.by(SELECTED_PLAYER).spell(this.trackedSpells), this.onHit);
 
@@ -64,15 +65,20 @@ class TitanicWrath extends Analyzer {
       Events.removedebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE),
       this.removeDebuff,
     );
+
+    this.ticksPerDisintegrate = GetDisintegrateTicks(this.selectedCombatant).disintegrateTicks;
+    this.ticksPerChainedDisintegrate = GetDisintegrateTicks(
+      this.selectedCombatant,
+    ).disintegrateChainedTicks;
   }
 
   onBuffRemove(event: RemoveBuffEvent) {
     if (HasRelatedEvent(event, ESSENCE_BURST_CONSUME)) {
       this.trackDamage = true;
       if (this.ticksToCount > 0) {
-        this.ticksToCount = DISINTEGRATE_CHAINED_TICKS;
+        this.ticksToCount = this.ticksPerChainedDisintegrate;
       } else {
-        this.ticksToCount = DISINTEGRATE_TICKS;
+        this.ticksToCount = this.ticksPerDisintegrate;
       }
     }
   }
@@ -81,15 +87,15 @@ class TitanicWrath extends Analyzer {
     if (HasRelatedEvent(event, ESSENCE_BURST_CONSUME)) {
       this.trackDamage = true;
       if (this.ticksToCount > 0) {
-        this.ticksToCount = DISINTEGRATE_CHAINED_TICKS;
+        this.ticksToCount = this.ticksPerChainedDisintegrate;
       } else {
-        this.ticksToCount = DISINTEGRATE_TICKS;
+        this.ticksToCount = this.ticksPerDisintegrate;
       }
     }
   }
 
   onCast(event: CastEvent) {
-    // Chanined disintegrate will carry over a buffed tick to the non buffed cast
+    // Chained disintegrate will carry over a buffed tick to the non buffed cast
     if (this.ticksToCount > 0 && !this.trackDamage) {
       this.ticksToCount = 1;
     }
@@ -106,14 +112,14 @@ class TitanicWrath extends Analyzer {
         this.trackDamage = false;
         this.titanicWrathDisintegrateDamage += calculateEffectiveDamage(
           event,
-          this.titanicWrathMultiplier,
+          TITANIC_WRATH_MULTIPLIER,
         );
       }
     } else if (event.ability.name === PYRE.name) {
       if (this.trackDamage || event.timestamp === this.lastDamEvent) {
         this.lastDamEvent = event.timestamp;
         this.trackDamage = false;
-        this.titanicWrathPyreDamage += calculateEffectiveDamage(event, this.titanicWrathMultiplier);
+        this.titanicWrathPyreDamage += calculateEffectiveDamage(event, TITANIC_WRATH_MULTIPLIER);
         this.ticksToCount = 0;
       }
     }

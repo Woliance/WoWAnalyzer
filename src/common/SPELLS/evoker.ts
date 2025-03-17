@@ -243,6 +243,11 @@ const spells = {
     name: 'Deep Breath',
     icon: 'ability_evoker_deepbreath',
   },
+  DEEP_BREATH_SCALECOMMANDER: {
+    id: 433874,
+    name: 'Deep Breath',
+    icon: 'ability_evoker_deepbreath',
+  },
   DEEP_BREATH_DAM: {
     id: 353759,
     name: 'Deep Breath',
@@ -309,6 +314,16 @@ const spells = {
     id: 370562,
     name: 'Stasis',
     icon: 'ability_evoker_stasis',
+  },
+  INSURANCE_HOT_EVOKER: {
+    id: 1215550,
+    name: 'Insurance',
+    icon: 'inv_10_inscription2_scroll2_color5',
+  },
+  INSURANCE_PROC_EVOKER: {
+    id: 1215553,
+    name: 'Insurance',
+    icon: 'inv_10_inscription2_scroll2_color5',
   },
   GIANT_SLAYER_MASTERY: {
     id: 362980,
@@ -468,6 +483,26 @@ const spells = {
     name: 'Temporal Wound',
     icon: 'ability_evoker_breathofeons',
   },
+  BREATH_OF_EONS_SCALECOMMANDER: {
+    id: 442204,
+    name: 'Breath of Eons',
+    icon: 'ability_evoker_breathofeons',
+  },
+  MELT_ARMOR: {
+    id: 441172,
+    name: 'Melt Armor',
+    icon: 'inv_10_gearupgrade_drakesshadowflameenhancedcrest',
+  },
+  BOMBARDMENTS_DAMAGE: {
+    id: 434481,
+    name: 'Bombardments',
+    icon: 'inv_ability_scalecommanderevoker_bombardments',
+  },
+  BOMBARDMENTS_DEBUFF: {
+    id: 434473,
+    name: 'Bombardments',
+    icon: 'inv_ability_scalecommanderevoker_bombardments',
+  },
   BLACK_ATTUNEMENT: {
     id: 403264,
     name: 'Black Attunement',
@@ -487,16 +522,6 @@ const spells = {
     id: 410686,
     name: 'Symbiotic Bloom',
     icon: 'inv_10_herb_seed_magiccolor5',
-  },
-  TREMBLING_EARTH_BUFF: {
-    id: 424368,
-    name: 'Trembling Earth',
-    icon: 'ability_evoker_eruption',
-  },
-  TREMBLING_EARTH_DAM: {
-    id: 424428,
-    name: 'Trembling Earth',
-    icon: 'ability_evoker_eruption',
   },
   TIME_OF_NEED_LIVING_FLAME: {
     id: 401382,
@@ -558,6 +583,183 @@ const spells = {
     name: 'Consume Flame',
     icon: 'inv_shadowflames_wave',
   },
+  SPIRITBLOOM_HOT: {
+    id: 409895,
+    name: 'Spiritbloom',
+    icon: 'ability_evoker_spiritbloom2',
+  },
+  UPHEAVAL_DOT: {
+    id: 431620,
+    name: 'Upheaval',
+    icon: 'ability_evoker_upheaval',
+  },
+  CHRONO_FLAME_CAST: {
+    id: 431443,
+    name: 'Chronoflame',
+    icon: 'inv_ability_chronowardenevoker_chronoflame',
+  },
+  CHRONO_FLAME_HEAL: {
+    id: 431483,
+    name: 'Chronoflame',
+    icon: 'inv_ability_chronowardenevoker_chronoflame',
+  },
+  CHRONO_FLAME_DAMAGE: {
+    id: 431583,
+    name: 'Chronoflame',
+    icon: 'inv_ability_chronowardenevoker_chronoflame',
+  },
+  THREAD_OF_FATE_BUFF: {
+    id: 431716,
+    name: 'Thread of Fate',
+    icon: 'ability_evoker_sandsoftime',
+  },
+  THREAD_OF_FATE_HEALING: {
+    id: 432896,
+    name: 'Thread of Fate',
+    icon: 'ability_evoker_sandsoftime',
+  },
+  THREAD_OF_FATE_DAMAGE: {
+    id: 432895,
+    name: 'Thread of Fate',
+    icon: 'ability_evoker_sandsoftime',
+  },
+  PRIMACY_BUFF: {
+    id: 431654,
+    name: 'Primacy',
+    icon: 'Inv_misc_pocketwatch_01',
+  },
+  TIME_CONVERGENCE_BUFF: {
+    id: 431991,
+    name: 'Time Convergence',
+    icon: 'ability_evoker_plotthefuture',
+  },
+  IMMINENT_DESTRUCTION_DEV_BUFF: {
+    id: 411055,
+    name: 'Imminent Destruction',
+    icon: 'spell_burningbladeshaman_blazing_radiance',
+  },
+  IMMINENT_DESTRUCTION_AUG_BUFF: {
+    id: 459574,
+    name: 'Imminent Destruction',
+    icon: 'spell_burningbladeshaman_blazing_radiance',
+  },
+  // region Scalecommander
+  MASS_DISINTEGRATE_BUFF: {
+    id: 436336,
+    name: 'Mass Disintegrate',
+    icon: 'ability_evoker_disintegrate',
+  },
+  MASS_ERUPTION_BUFF: {
+    id: 438588,
+    name: 'Mass Eruption',
+    icon: 'ability_evoker_eruption',
+  },
+  MASS_ERUPTION_DAMAGE: {
+    id: 438653,
+    name: 'Mass Eruption',
+    icon: 'ability_evoker_eruption',
+  },
+  UNRELENTING_SIEGE_BUFF: {
+    id: 441248,
+    name: 'Unrelenting Siege',
+    icon: 'ability_siege_engineer_superheated',
+  },
+  MOMENTUM_SHIFT_BUFF: {
+    id: 408005,
+    name: 'Momentum Shift',
+    icon: 'ability_priest_voidshift',
+  },
+  VOLCANIC_UPSURGE: {
+    id: 456142,
+    name: 'Volcanic Upsurge',
+    icon: 'ability_evoker_earthensky',
+  },
+  GOLDEN_OPPORTUNITY_BUFF: {
+    id: 459878,
+    name: 'Golden Opportunity',
+    icon: 'achievement_faction_goldenlotus',
+  },
+  MOTES_OF_ACCELERATION_BUFF: {
+    id: 432061,
+    name: 'Motes of Acceleration',
+    icon: 'item_timemote_icon',
+  },
+  TIME_SPIRAL_DEATH_KNIGHT_BUFF: {
+    id: 375226,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_DEMON_HUNTER_BUFF: {
+    id: 375229,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_DRUID_BUFF: {
+    id: 375230,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_EVOKER_BUFF: {
+    id: 375234,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_HUNTER_BUFF: {
+    id: 375238,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_MAGE_BUFF: {
+    id: 375240,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_MONK_BUFF: {
+    id: 375252,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_PALADIN_BUFF: {
+    id: 375253,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_PRIEST_BUFF: {
+    id: 375254,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_ROGUE_BUFF: {
+    id: 375255,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_SHAMAN_BUFF: {
+    id: 375256,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_WARLOCK_BUFF: {
+    id: 375257,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  TIME_SPIRAL_WARRIOR_BUFF: {
+    id: 375258,
+    name: 'Time Spiral',
+    icon: 'ability_evoker_timespiral',
+  },
+  JACKPOT_BUFF: {
+    id: 1217769,
+    name: 'Jackpot!',
+    icon: 'inv_10_fishing_dragonislescoins_gold',
+  },
+  INFERNOS_BLESSING_BUFF: {
+    id: 410263,
+    name: "Inferno's Blessing",
+    icon: 'ability_evoker_infernosblessing',
+  },
+  // endregion
 } satisfies Record<string, Spell>;
 
 export default spells;

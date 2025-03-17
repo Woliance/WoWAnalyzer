@@ -299,7 +299,7 @@ class RageGenerationNormalizer extends EventsNormalizer {
     this.hasIW = this.selectedCombatant.hasTalent(TALENTS_WARRIOR.IMPENETRABLE_WALL_TALENT);
 
     // auto attacks
-    this.hasWM = this.selectedCombatant.hasTalent(TALENTS_WARRIOR.WAR_MACHINE_PROTECTION_TALENT);
+    this.hasWM = this.selectedCombatant.hasTalent(TALENTS_WARRIOR.WAR_MACHINE_TALENT);
     this.hasDevestator = this.selectedCombatant.hasTalent(TALENTS_WARRIOR.DEVASTATOR_TALENT);
     this.hasInstigate = this.selectedCombatant.hasTalent(TALENTS_WARRIOR.INSTIGATE_TALENT);
 
@@ -388,7 +388,7 @@ class RageGenerationNormalizer extends EventsNormalizer {
           const newEvent = this._removeMultiplicitiveIncrease(
             event,
             WARMACHINE_INCREASE,
-            TALENTS_WARRIOR.WAR_MACHINE_PROTECTION_TALENT,
+            TALENTS_WARRIOR.WAR_MACHINE_TALENT,
           );
           updatedEvents.push(newEvent);
         }
@@ -417,7 +417,7 @@ class RageGenerationNormalizer extends EventsNormalizer {
 
       if (this.hasPV) {
         // Spear of Bastion Area
-        if (event.ability.guid === SPELLS.SPEAR_OF_BASTION.id) {
+        if (event.ability.guid === SPELLS.CHAMPIONS_SPEAR.id) {
           const newEvent = this._removeMultiplicitiveIncrease(
             event,
             PIERCING_CHALLENGE_INCREASE,

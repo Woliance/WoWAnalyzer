@@ -10,6 +10,8 @@ import HotTrackerRestoDruid from '../hottracking/HotTrackerRestoDruid';
 import { TALENTS_DRUID } from 'common/TALENTS';
 import Combatants from 'parser/shared/modules/Combatants';
 import { isConvoking } from 'analysis/retail/druid/shared/spells/ConvokeSpirits';
+import { TIERS } from 'game/TIERS';
+import { isHotFromInsurance } from 'analysis/retail/druid/restoration/normalizers/TWW2TierSetNormalizer';
 
 /** Maximum time buffer between a hardcast and applybuff to allow attribution */
 const BUFFER_MS = 150;
@@ -37,9 +39,9 @@ class HotAttributor extends Analyzer {
 
   hasOvergrowth: boolean;
   hasPowerOfTheArchdruid: boolean;
-  hasLuxuriantSoil: boolean;
   hasRampantGrowth: boolean;
   hasConvoke: boolean;
+  hasTww2Tier4pc: boolean;
 
   /** Special tracker to differentiate PotA procs during Convoke.
    *  We arbitrarily call the first Regrowth hit the 'direct' one, and follow-on ones
@@ -53,12 +55,12 @@ class HotAttributor extends Analyzer {
   regrowthHardcastAttrib = HotTracker.getNewAttribution('Regrowth Hardcast');
   wgHardcastAttrib = HotTracker.getNewAttribution('Wild Growth Hardcast');
   lbHardcastAttrib = HotTracker.getNewAttribution('Lifebloom Hardcast');
-  // track various talent attributions
+  // track various talent/tier attributions
   overgrowthAttrib = HotTracker.getNewAttribution('Overgrowth');
   powerOfTheArchdruidRejuvAttrib = HotTracker.getNewAttribution('PowerOfTheArchdruid-Rejuv');
   powerOfTheArchdruidRegrowthAttrib = HotTracker.getNewAttribution('PowerOfTheArchdruid-Regrowth');
-  luxuriantSoilAttrib = HotTracker.getNewAttribution('LuxuriantSoil');
   rampantGrowthAttrib = HotTracker.getNewAttribution('RampantGrowth');
+  tww2TierAttrib = HotTracker.getNewAttribution('InsuranceExpire');
   // Convoke handled separately in Resto Convoke module
 
   constructor(options: Options) {
@@ -68,9 +70,9 @@ class HotAttributor extends Analyzer {
     this.hasPowerOfTheArchdruid = this.selectedCombatant.hasTalent(
       TALENTS_DRUID.POWER_OF_THE_ARCHDRUID_TALENT,
     );
-    this.hasLuxuriantSoil = this.selectedCombatant.hasTalent(TALENTS_DRUID.LUXURIANT_SOIL_TALENT);
     this.hasRampantGrowth = this.selectedCombatant.hasTalent(TALENTS_DRUID.RAMPANT_GROWTH_TALENT);
     this.hasConvoke = this.selectedCombatant.hasTalent(TALENTS_DRUID.CONVOKE_THE_SPIRITS_TALENT);
+    this.hasTww2Tier4pc = this.selectedCombatant.has4PieceByTier(TIERS.TWW2);
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(REJUVENATION_BUFFS),
@@ -117,6 +119,10 @@ class HotAttributor extends Analyzer {
     if (event.prepull || isFromHardcast(event)) {
       this.hotTracker.addAttributionFromApply(this.rejuvHardcastAttrib, event);
       this._logAttrib(event, 'Hardcast');
+    } else if (this.hasTww2Tier4pc && isHotFromInsurance(event)) {
+      // proc rate is 100% from expiring Insurance which can happen during Convoke, so we'll check it before the Convoke check
+      this.hotTracker.addAttributionFromApply(this.tww2TierAttrib, event);
+      this._logAttrib(event, this.tww2TierAttrib);
     } else if (this.convokeSpirits.active && isConvoking(this.selectedCombatant)) {
       // if we have PotA buff and this isn't the first Rejuv in sequence within buffer - also attribute to PotA
       if (
@@ -136,9 +142,6 @@ class HotAttributor extends Analyzer {
     } else if (possiblePota) {
       this.hotTracker.addAttributionFromApply(this.powerOfTheArchdruidRejuvAttrib, event);
       this._logAttrib(event, this.powerOfTheArchdruidRejuvAttrib);
-    } else if (this.hasLuxuriantSoil) {
-      this.hotTracker.addAttributionFromApply(this.luxuriantSoilAttrib, event);
-      this._logAttrib(event, this.luxuriantSoilAttrib);
     } else {
       this._logAttrib(event, undefined);
     }
@@ -162,6 +165,10 @@ class HotAttributor extends Analyzer {
     if (event.prepull || isFromHardcast(event)) {
       this.hotTracker.addAttributionFromApply(this.regrowthHardcastAttrib, event);
       this._logAttrib(event, 'Hardcast');
+    } else if (this.hasTww2Tier4pc && isHotFromInsurance(event)) {
+      // proc rate is 100% from expiring Insurance which can happen during Convoke, so we'll check it before the Convoke check
+      this.hotTracker.addAttributionFromApply(this.tww2TierAttrib, event);
+      this._logAttrib(event, this.tww2TierAttrib);
     } else if (this.convokeSpirits.active && isConvoking(this.selectedCombatant)) {
       // could possible also be due to RG or PotA
       if (possibleRg) {
@@ -183,6 +190,9 @@ class HotAttributor extends Analyzer {
     } else if (isFromOvergrowth(event)) {
       this.hotTracker.addAttributionFromApply(this.overgrowthAttrib, event);
       this._logAttrib(event, this.overgrowthAttrib);
+    } else if (possibleRg) {
+      this.hotTracker.addAttributionFromApply(this.rampantGrowthAttrib, event);
+      this._logAttrib(event, this.rampantGrowthAttrib);
     } else if (possiblePota) {
       this.hotTracker.addAttributionFromApply(this.powerOfTheArchdruidRegrowthAttrib, event);
       this._logAttrib(event, this.powerOfTheArchdruidRegrowthAttrib);
@@ -228,6 +238,10 @@ class HotAttributor extends Analyzer {
       this.hotTracker.addAttributionFromApply(this.wgHardcastAttrib, event);
       this._logAttrib(event, 'Hardcast');
       // don't clear pending because it hits many targets
+    } else if (this.hasTww2Tier4pc && isHotFromInsurance(event)) {
+      // proc rate is 100% from expiring Insurance which can happen during Convoke, so we'll check it before the Convoke check
+      this.hotTracker.addAttributionFromApply(this.tww2TierAttrib, event);
+      this._logAttrib(event, this.tww2TierAttrib);
     } else if (this.convokeSpirits.active && isConvoking(this.selectedCombatant)) {
       // convoke module adds the attribution for Convoke
       this._logAttrib(event, this.convokeSpirits.currentConvokeAttribution);

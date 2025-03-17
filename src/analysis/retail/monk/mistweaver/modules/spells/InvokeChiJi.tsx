@@ -23,7 +23,7 @@ import Statistic from 'parser/ui/Statistic';
 import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
-import { MAX_CHIJI_STACKS } from '../../constants';
+import { getCurrentRSKTalent, getCurrentRSKTalentDamage, MAX_CHIJI_STACKS } from '../../constants';
 import BaseCelestialAnalyzer, { BaseCelestialTracker } from './BaseCelestialAnalyzer';
 import InformationIcon from 'interface/icons/Information';
 import EnvelopingBreath from './EnvelopingBreath';
@@ -82,7 +82,7 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
       this.handleEnvelopingBreath,
     );
     this.addEventListener(
-      Events.absorbed.by(SELECTED_PLAYER).spell(SPELLS.CHI_COCOON_HEAL_CHIIJI),
+      Events.absorbed.by(SELECTED_PLAYER).spell(SPELLS.CHI_COCOON_BUFF_CHIJI),
       this.handleChiCocoon,
     );
     this.addEventListener(
@@ -98,7 +98,7 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
         .by(SELECTED_PLAYER)
         .spell([
           SPELLS.BLACKOUT_KICK,
-          SPELLS.RISING_SUN_KICK_DAMAGE,
+          getCurrentRSKTalentDamage(this.selectedCombatant),
           SPELLS.BLACKOUT_KICK_TOTM,
           SPELLS.SPINNING_CRANE_KICK_DAMAGE,
         ]),
@@ -111,7 +111,7 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
     );
     this.addEventListener(Events.GlobalCooldown.by(SELECTED_PLAYER), this.handleGlobal);
     this.addEventListener(
-      Events.cast.by(SELECTED_PLAYER).spell(TALENTS_MONK.RISING_SUN_KICK_TALENT),
+      Events.cast.by(SELECTED_PLAYER).spell(getCurrentRSKTalent(this.selectedCombatant)),
       this.onRSK,
     );
     this.addEventListener(
@@ -300,6 +300,15 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
         healing comes from. It is important to avoid overcapping on{' '}
         <SpellLink spell={TALENTS_MONK.TEACHINGS_OF_THE_MONASTERY_TALENT} /> and{' '}
         <SpellLink spell={SPELLS.INVOKE_CHIJI_THE_RED_CRANE_BUFF} /> stacks.
+        <div>
+          <br />
+          Generally, you should try to alternate between <SpellLink spell={SPELLS.TIGER_PALM} />/
+          <SpellLink spell={getCurrentRSKTalent(this.selectedCombatant)} /> (if available) and{' '}
+          <SpellLink spell={SPELLS.BLACKOUT_KICK} /> as you only get 3{' '}
+          <SpellLink spell={SPELLS.GUST_OF_MISTS_CHIJI} /> events per{' '}
+          <SpellLink spell={SPELLS.BLACKOUT_KICK} /> cast, regardless of{' '}
+          <SpellLink spell={TALENTS_MONK.TEACHINGS_OF_THE_MONASTERY_TALENT} /> stacks.
+        </div>
       </p>
     );
 
@@ -410,7 +419,7 @@ class InvokeChiJi extends BaseCelestialAnalyzer {
               </li>
               <li>
                 {formatNumber(this.chiCocoonHealing)}{' '}
-                <SpellLink spell={SPELLS.CHI_COCOON_HEAL_CHIIJI} /> healing from{' '}
+                <SpellLink spell={SPELLS.CHI_COCOON_BUFF_CHIJI} /> healing from{' '}
                 <SpellLink spell={TALENTS_MONK.CELESTIAL_HARMONY_TALENT} />.
               </li>
             </ul>

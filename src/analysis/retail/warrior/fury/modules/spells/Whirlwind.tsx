@@ -1,4 +1,5 @@
 import { defineMessage } from '@lingui/macro';
+import RageTracker from 'analysis/retail/warrior/shared/modules/core/RageTracker';
 import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import talents from 'common/TALENTS/warrior';
@@ -6,9 +7,8 @@ import { SpellLink } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent, DamageEvent } from 'parser/core/Events';
 import { ThresholdStyle, When } from 'parser/core/ParseResults';
-import SpellUsable from 'parser/shared/modules/SpellUsable';
+import SpellUsable from '../features/SpellUsable';
 
-import RageTracker from '../core/RageTracker';
 import { addInefficientCastReason } from 'parser/core/EventMetaLib';
 
 class Whirlwind extends Analyzer {

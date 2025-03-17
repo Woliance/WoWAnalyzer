@@ -33,9 +33,8 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: TALENTS.ARCANE_ORB_TALENT.id,
+        spell: SPELLS.ARCANE_ORB.id,
         category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        enabled: combatant.hasTalent(TALENTS.ARCANE_ORB_TALENT),
         gcd: {
           base: 1500,
         },
@@ -43,7 +42,9 @@ class Abilities extends CoreAbilities {
         charges: 1 + combatant.getTalentRank(TALENTS.CHARGED_ORB_TALENT),
         castEfficiency: {
           suggestion: true,
-          recommendedEfficiency: 0.9,
+          recommendedEfficiency: combatant.hasTalent(TALENTS.CHARGED_ORB_TALENT) ? 0.9 : 0.8,
+          averageIssueEfficiency: combatant.hasTalent(TALENTS.CHARGED_ORB_TALENT) ? 0.8 : 0.65,
+          majorIssueEfficiency: combatant.hasTalent(TALENTS.CHARGED_ORB_TALENT) ? 0.6 : 0.5,
         },
         damageSpellIds: [SPELLS.ARCANE_ORB_DAMAGE.id],
       },

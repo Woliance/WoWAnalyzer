@@ -19,15 +19,21 @@ import ExplanationGraph, {
   generateGraphData,
 } from 'analysis/retail/evoker/shared/modules/components/ExplanationGraph';
 import { SpellLink } from 'interface';
-import { DISINTEGRATE_REMOVE_APPLY } from '../normalizers/CastLinkNormalizer';
+import {
+  DISINTEGRATE_REMOVE_APPLY,
+  getDisintegrateTargetCount,
+  isFromMassDisintegrate,
+  isMassDisintegrateDebuff,
+  isMassDisintegrateTick,
+} from '../normalizers/CastLinkNormalizer';
 import { isMythicPlus } from 'common/isMythicPlus';
 import { InformationIcon } from 'interface/icons';
+import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
+import { GetDisintegrateTicks } from '../../constants';
 
 const { DISINTEGRATE } = SPELLS;
 
 const { DRAGONRAGE_TALENT } = TALENTS;
-
-const TICKS_PER_DISINTEGRATE = 4;
 
 /**
  * Disintegrate is Devastation's ST spender, it is one of the primary focus points of your rotation.
@@ -57,6 +63,11 @@ class Disintegrate extends Analyzer {
   dragonRageCasts: number = 0;
   inDragonRageWindow: boolean = false;
 
+  totalMassDisintegrateTargets = 0;
+  totalMassDisintegrateTicks = 0;
+
+  currentMainTarget = '';
+
   /** Variables used for graph */
   currentRemainingTicks: number = 0;
   isCurrentCastChained: boolean = false;
@@ -65,6 +76,8 @@ class Disintegrate extends Analyzer {
 
   fightStartTime: number = 0;
   fightEndTime: number = 0;
+
+  isCurrentCastMassDisintegrate = false;
 
   /** Spells that you can/should clip with
    * Any other spell used to clip Disintegrate
@@ -80,54 +93,63 @@ class Disintegrate extends Analyzer {
     SPELLS.AZURE_STRIKE,
     TALENTS.SHATTERING_STAR_TALENT,
     TALENTS.PYRE_TALENT,
+    TALENTS.ENGULF_TALENT,
+    TALENTS.DRAGONRAGE_TALENT,
+    SPELLS.DEEP_BREATH,
+    SPELLS.DEEP_BREATH_SCALECOMMANDER,
   ];
 
   graphData: GraphData[] = [];
 
   disintegrateTicksCounter: SpellTracker[] = [];
   disintegrateCasts: SpellTracker[] = [];
+  massDisintegrateCasts: SpellTracker[] = [];
   disintegrateChainCasts: SpellTracker[] = [];
   disintegrateClips: SpellTracker[] = [];
   problemPoints: SpellTracker[] = [];
   dragonrageBuffCounter: SpellTracker[] = [];
+
+  ticksPerDisintegrate = 0;
+  ticksPerChainedDisintegrate = 0;
 
   constructor(options: Options) {
     super(options);
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(DRAGONRAGE_TALENT),
-      (event) => {
-        this.onBuffApply(event);
-      },
+      this.onApplyDragonrage,
+    );
+    this.addEventListener(
+      Events.removebuff.by(SELECTED_PLAYER).spell(DRAGONRAGE_TALENT),
+      this.onRemoveDragonrage,
     );
 
     this.addEventListener(
-      Events.removebuff.by(SELECTED_PLAYER).spell(DRAGONRAGE_TALENT),
-      (event) => {
-        this.onBuffRemove(event);
-      },
+      Events.damage.by(SELECTED_PLAYER).spell(DISINTEGRATE),
+      this.onDisintegrateTick,
     );
-
-    this.addEventListener(Events.damage.by(SELECTED_PLAYER).spell(DISINTEGRATE), (event) => {
-      this.onDamage(event);
-    });
-
-    this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(DISINTEGRATE), this.onCast);
+    this.addEventListener(
+      Events.cast.by(SELECTED_PLAYER).spell(DISINTEGRATE),
+      this.onDisintegrateCast,
+    );
 
     /**
      * We use debuff events for Disintegrate for consistency
      * Since the only way to know when a disintegrate ended is on removed debuff
      * and the first damage tick happens on application not cast.
      */
-    this.addEventListener(Events.applydebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE), (event) => {
-      this.onApplyDebuff(event);
-    });
-    this.addEventListener(Events.refreshdebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE), (event) => {
-      this.onRefreshDebuff(event);
-    });
-    this.addEventListener(Events.removedebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE), (event) => {
-      this.onRemoveDebuff(event);
-    });
+    this.addEventListener(
+      Events.applydebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE),
+      this.onApplyDebuff,
+    );
+    this.addEventListener(
+      Events.refreshdebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE),
+      this.onRefreshDebuff,
+    );
+    this.addEventListener(
+      Events.removedebuff.by(SELECTED_PLAYER).spell(DISINTEGRATE),
+      this.onRemoveDebuff,
+    );
     /** Grab the spell we clipped with - this event always happens before the debuffRemove event
      * (Atleast for all the logs I've looked at so far) */
     this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(this.trackedSpells), (event) => {
@@ -137,20 +159,27 @@ class Disintegrate extends Analyzer {
     });
 
     this.addEventListener(Events.fightend, () => {
+      /* console.log(this.totalMassDisintegrateTargets);
+      console.log(this.totalMassDisintegrateTicks); */
       this.pushToGraphData();
     });
+
+    this.ticksPerDisintegrate = GetDisintegrateTicks(this.selectedCombatant).disintegrateTicks;
+    this.ticksPerChainedDisintegrate = GetDisintegrateTicks(
+      this.selectedCombatant,
+    ).disintegrateChainedTicks;
   }
 
-  onBuffApply(event: ApplyBuffEvent) {
+  onApplyDragonrage(event: ApplyBuffEvent) {
     this.dragonrageBuffCounter.push({
       timestamp: event.timestamp,
-      count: 5,
+      count: this.ticksPerChainedDisintegrate,
       tooltip: '',
     });
     this.inDragonRageWindow = true;
   }
 
-  onBuffRemove(event: RemoveBuffEvent) {
+  onRemoveDragonrage(event: RemoveBuffEvent) {
     this.dragonrageBuffCounter.push({
       timestamp: event.timestamp,
       count: 0,
@@ -159,10 +188,19 @@ class Disintegrate extends Analyzer {
     this.inDragonRageWindow = false;
   }
 
-  onDamage(event: DamageEvent) {
-    this.totalTicks += 1;
-    if (this.inDragonRageWindow) {
-      this.dragonRageTicks += 1;
+  onDisintegrateTick(event: DamageEvent) {
+    if (isMassDisintegrateTick(event)) {
+      this.totalMassDisintegrateTicks += 1;
+      return;
+    }
+
+    if (this.isCurrentCastMassDisintegrate) {
+      this.totalMassDisintegrateTicks += 1;
+    } else {
+      this.totalTicks += 1;
+      if (this.inDragonRageWindow) {
+        this.dragonRageTicks += 1;
+      }
     }
 
     // This should not happen but w/e
@@ -178,19 +216,29 @@ class Disintegrate extends Analyzer {
     });
   }
 
-  onCast() {
-    this.totalCasts += 1;
-    if (this.inDragonRageWindow) {
-      this.dragonRageCasts += 1;
+  onDisintegrateCast(event: CastEvent) {
+    const isMassDisintegrate = isFromMassDisintegrate(event);
+    this.isCurrentCastMassDisintegrate = isMassDisintegrate;
+
+    if (isMassDisintegrate) {
+      this.totalMassDisintegrateTargets += getDisintegrateTargetCount(event);
+    } else {
+      this.totalCasts += 1;
+      if (this.inDragonRageWindow) {
+        this.dragonRageCasts += 1;
+      }
     }
   }
 
   get tickData() {
     const regularTicks = this.totalTicks - this.dragonRageTicks;
     const totalPossibleRegularTicks =
-      (this.totalCasts - this.dragonRageCasts) * TICKS_PER_DISINTEGRATE;
+      (this.totalCasts - this.dragonRageCasts) * this.ticksPerDisintegrate;
     const dragonRageTicks = this.dragonRageTicks;
-    const totalPossibleDragonRageTicks = this.dragonRageCasts * TICKS_PER_DISINTEGRATE;
+    const totalPossibleDragonRageTicks = this.dragonRageCasts * this.ticksPerDisintegrate;
+
+    const totalPossibleMassDisintegrateTicks =
+      this.totalMassDisintegrateTargets * this.ticksPerDisintegrate;
 
     return {
       regularTicks,
@@ -199,16 +247,25 @@ class Disintegrate extends Analyzer {
       dragonRageTicks,
       totalPossibleDragonRageTicks,
       dragonRageTickRatio: dragonRageTicks / totalPossibleDragonRageTicks,
+      massDisintegrateTicks: this.totalMassDisintegrateTicks,
+      totalPossibleMassDisintegrateTicks,
     };
   }
 
   onApplyDebuff(event: ApplyDebuffEvent) {
+    if (isMassDisintegrateDebuff(event)) {
+      return;
+    }
+
     // This is actually a refresh event
     if (HasRelatedEvent(event, DISINTEGRATE_REMOVE_APPLY)) {
       this.onRefreshDebuff(event);
       return;
     }
-    this.currentRemainingTicks = TICKS_PER_DISINTEGRATE;
+
+    this.currentMainTarget = encodeEventTargetString(event);
+
+    this.currentRemainingTicks = this.ticksPerDisintegrate;
     this.isCurrentCastChained = false;
     this.disintegrateClipSpell = undefined;
 
@@ -218,14 +275,25 @@ class Disintegrate extends Analyzer {
       tooltip: '',
     });
 
-    this.disintegrateCasts.push({
-      timestamp: event.timestamp,
-      count: this.currentRemainingTicks,
-      tooltip: 'Cast',
-    });
+    if (this.isCurrentCastMassDisintegrate) {
+      this.massDisintegrateCasts.push({
+        timestamp: event.timestamp,
+        count: this.currentRemainingTicks,
+        tooltip: 'Mass Disintegrate Cast',
+      });
+    } else {
+      this.disintegrateCasts.push({
+        timestamp: event.timestamp,
+        count: this.currentRemainingTicks,
+        tooltip: 'Cast',
+      });
+    }
   }
 
   onRefreshDebuff(event: RefreshDebuffEvent | ApplyDebuffEvent) {
+    if (isMassDisintegrateDebuff(event)) {
+      return;
+    }
     // Clipped before GCD, very bad
     if (this.currentRemainingTicks >= (this.isCurrentCastChained ? 3 : 2)) {
       this.problemPoints.push({
@@ -233,8 +301,9 @@ class Disintegrate extends Analyzer {
         count: this.currentRemainingTicks,
         tooltip: 'Bad Chain, you chained before the 3rd tick.',
       });
-    } // Clipped ticks outside of DR, bad
-    else if (!this.inDragonRageWindow && this.currentRemainingTicks > 1) {
+    } // Clipped ticks outside of DR, bad - for TWW S1 this is optimal
+    // In TWW S1 this is now optimal, will prolly become un-optimal again
+    /* else if (!this.inDragonRageWindow && this.currentRemainingTicks > 1) {
       this.problemPoints.push({
         timestamp: event.timestamp,
         count: this.currentRemainingTicks,
@@ -243,22 +312,33 @@ class Disintegrate extends Analyzer {
           (this.currentRemainingTicks - 1) +
           ' tick(s) outside of Dragonrage',
       });
-    } else {
-      this.disintegrateChainCasts.push({
-        timestamp: event.timestamp,
-        count: this.currentRemainingTicks,
-        tooltip:
-          this.currentRemainingTicks === 2
-            ? 'Good Chain, you clipped: ' +
-              (this.currentRemainingTicks - 1) +
-              ' tick inside of Dragonrage'
-            : 'Good Chain',
-      });
+    }  */
+    else {
+      if (this.isCurrentCastMassDisintegrate) {
+        this.massDisintegrateCasts.push({
+          timestamp: event.timestamp,
+          count: this.currentRemainingTicks,
+          tooltip:
+            this.currentRemainingTicks === 2
+              ? 'Good Chain, you clipped: ' + (this.currentRemainingTicks - 1) + ` tick(s)`
+              : 'Good Chain',
+        });
+      } else {
+        this.disintegrateChainCasts.push({
+          timestamp: event.timestamp,
+          count: this.currentRemainingTicks,
+          tooltip:
+            this.currentRemainingTicks === 2
+              ? 'Good Chain, you clipped: ' + (this.currentRemainingTicks - 1) + ` tick(s)`
+              : 'Good Chain',
+        });
+      }
     }
 
     this.isCurrentCastChained = true;
     /** Chained Disintegrate moves over one tick from current cast (Pandemic) */
-    this.currentRemainingTicks = TICKS_PER_DISINTEGRATE + Math.min(this.currentRemainingTicks, 1);
+    this.currentRemainingTicks =
+      this.ticksPerDisintegrate + Math.min(this.currentRemainingTicks, 1);
 
     this.disintegrateTicksCounter.push({
       timestamp: event.timestamp,
@@ -277,11 +357,16 @@ class Disintegrate extends Analyzer {
     if (HasRelatedEvent(event, DISINTEGRATE_REMOVE_APPLY)) {
       return;
     }
+
+    if (this.currentMainTarget !== encodeEventTargetString(event)) {
+      return;
+    }
+
     /**
      * Here we wanna check if we clipped the Disintegrate to cast a higher
      * prio spell, this is currently optimal gameplay during Dragonrage
      */
-    if (this.disintegrateClipSpell && this.inDragonRageWindow) {
+    if (this.disintegrateClipSpell /*  && this.inDragonRageWindow */) {
       // Clipped before GCD, very bad
       if (this.currentRemainingTicks > (this.isCurrentCastChained ? 3 : 2)) {
         this.problemPoints.push({
@@ -304,8 +389,9 @@ class Disintegrate extends Analyzer {
         });
       }
     } // We clipped outside of Dragonrage, bad
+    // In TWW S1 this is now optimal, will prolly become un-optimal again
     else if (this.currentRemainingTicks >= 1) {
-      if (this.disintegrateClipSpell) {
+      /* if (this.disintegrateClipSpell) {
         this.problemPoints.push({
           timestamp: event.timestamp,
           count: this.currentRemainingTicks,
@@ -316,13 +402,13 @@ class Disintegrate extends Analyzer {
             this.disintegrateClipSpell.ability.name,
         });
       } // Straight cancelled Disintegrate, very bad - learn to use hover madge
-      else {
-        this.problemPoints.push({
-          timestamp: event.timestamp,
-          count: this.currentRemainingTicks,
-          tooltip: 'Cancelled channel, losing: ' + this.currentRemainingTicks + ' tick(s)',
-        });
-      }
+      else { */
+      this.problemPoints.push({
+        timestamp: event.timestamp,
+        count: this.currentRemainingTicks,
+        tooltip: 'Cancelled channel, losing: ' + this.currentRemainingTicks + ' tick(s)',
+      });
+      /* } */
     }
 
     this.currentRemainingTicks = 0;
@@ -361,6 +447,12 @@ class Disintegrate extends Analyzer {
         type: 'point',
         color: '#2ecc71',
         label: 'Disintegrate Casts',
+      },
+      {
+        spellTracker: this.massDisintegrateCasts,
+        type: 'point',
+        color: '#aa774f',
+        label: 'Mass Disintegrate Casts',
       },
       {
         spellTracker: this.disintegrateChainCasts,
@@ -424,6 +516,14 @@ class Disintegrate extends Analyzer {
             <li>
               Casts are highlighted in <span style={{ color: '#2ecc71' }}>green</span>
             </li>
+            {this.massDisintegrateCasts.length > 0 && (
+              <>
+                <li>
+                  Mass Disintegrate Casts are highlighted in{' '}
+                  <span style={{ color: '#aa774f' }}>brown</span>
+                </li>
+              </>
+            )}
             <li>
               Chained casts are highlighted in <span style={{ color: 'orange' }}>orange</span>
             </li>

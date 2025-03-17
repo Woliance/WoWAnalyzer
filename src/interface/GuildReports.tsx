@@ -15,11 +15,12 @@ import { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { isSupportedRegion } from 'common/regions';
 
+import './report/Results/Header.scss';
 import './GuildReports.scss';
 import ReportsList from './GuildReportsList';
 import ALLIANCE_PICTURE from './images/ally_guild_banner_bwl.jpg';
 import HORDE_PICTURE from './images/horde_guild_banner_onyx.jpg';
-import CLASSIC_PICTURE from './images/classic_guild_banner_lich_king.jpg';
+import CLASSIC_PICTURE from './images/classic_guild_banner.jpg';
 
 const loadRealms = (classic: boolean) =>
   retryingPromise(() =>
@@ -431,10 +432,12 @@ class GuildReports extends Component<Props, State> {
               )}
             </div>
             <div className="player">
-              <h2>
-                {this.props.region} - {this.props.realm}
-              </h2>
-              <h1>{this.props.name}</h1>
+              <div className="details">
+                <h2>
+                  {this.props.region} - {this.props.realm}
+                </h2>
+                <h1>{this.props.name}</h1>
+              </div>
             </div>
           </div>
           <nav>

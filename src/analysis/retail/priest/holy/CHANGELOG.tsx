@@ -1,22 +1,43 @@
 import { change, date } from 'common/changelog';
 import SPELLS from 'common/SPELLS';
 import TALENTS, { TALENTS_PRIEST } from 'common/TALENTS/priest';
-import { Arlie, Hana, Litena, Squided, ToppleTheNun, Trevor, Saeldur } from 'CONTRIBUTORS';
+import { Arlie, Hana, Litena, Liavre, squided, ToppleTheNun, Trevor, Saeldur, xizbow, fel1ne} from 'CONTRIBUTORS';
 import { SpellLink } from 'interface';
 
 export default [
+  change(date(2024, 11, 14), <>Updated Holy to 11.0.7</>, Liavre),
+  change(date(2024, 10, 26), <>Added <SpellLink spell={SPELLS.RESONANT_WORDS_TALENT_BUFF} /> guide analysis.</>, xizbow),
+  change(date(2024, 10, 20), <>Implement <SpellLink spell={SPELLS.TRAIL_OF_LIGHT_TALENT_HEAL}/> and <SpellLink spell={SPELLS.BINDING_HEALS_TALENT_HEAL}/> healing to Lightweaver module.</>, fel1ne),
+  change(date(2024, 10, 17), <>Fixed an issue where <SpellLink spell={SPELLS.LIGHTWEAVER_TALENT_BUFF}/> buffed heals were incorrectly flagged as a bad cast if the buff was not consumed due to a bug. </>, fel1ne),
+  change(date(2024, 10, 11), <>Fixed Prayer of Healing in the Guide section to not give bad advice.</>, Liavre),
+  change(date(2024, 10, 7), <>Properly hide Circle of Healing analysis if it isn't talented.</>, xizbow),
+  change(date(2024, 9, 21), <>Changed tooltips, added crisis management, and added prismatic echoes </>, Liavre),
+  change(date(2024, 9, 16), <>Implemented TWW S1 4pc </>, Liavre),
+  change(date(2024, 9, 11), <>Split Divine Hymn/GS into proper attributions, fixed mana costs,
+  and added talent check on holy word CDR. </>, Liavre),
+  change(date(2024, 9, 11), <>Fixed Salvation, Divine Star, Halo to include absorbed healing as effective healing. </>, Liavre),
+  change(date(2024, 9, 10), <>Added cast number and minor fixes to CDR module. </>, Liavre),
+  change(date(2024, 9, 10), <>Fixed lightwell and trail modules </>, Liavre),
+  change(date(2024, 9, 9), <>Implemented Echo of Light module/attribution into every other module </>, Liavre),
+  change(date(2024, 9, 6), <>Implemented 2pc, rewrote back end for Holy Word CDR and remove old modules. </>, Liavre),
+  change(date(2024, 9, 6), <>Moved all spell constants to constants file for ease of maintenance </>, Liavre),
+  change(date(2024, 8, 31), <>Implemented an Echo of Light per heal/amp attributor </>, Liavre),
+  change(date(2024, 8, 20), <>Implemented/pushed Archon </>, Liavre),
+  change(date(2024, 8, 24), <>Added Cast time hps component to lightweaver and other statistic display improvements </>, Liavre),
+  change(date(2024, 8, 20), <>Implemented both Oracle and Archon + minor fixes </>, Liavre),
+  change(date(2024, 8, 13), <>Deleted references to Mindgames (old talent) </>, Liavre),
   change(date(2024, 4, 20), <>Fix cooldown of <SpellLink spell={SPELLS.DESPERATE_PRAYER} /> when using <SpellLink spell={TALENTS_PRIEST.ANGELS_MERCY_TALENT} />.</>, Arlie),
   change(
     date(2024, 4, 18),
     <>
       Partially updated for patch 10.2.6. Implementation still may be lacking. {' '}
-      Update <SpellLink spell={TALENTS_PRIEST.PONTIFEX_TALENT} />, {' '}
+      Update Pontifex, {' '}
       Implement <SpellLink spell={TALENTS_PRIEST.LIGHTWELL_TALENT} />, {' '}
-      Update <SpellLink spell={TALENTS_PRIEST.HOLY_WORD_SALVATION_TALENT} /> to better claim Renew healing, {' '}
+      Update Holy Word: Salvation to better claim Renew healing, {' '}
       Update <SpellLink spell={TALENTS_PRIEST.BENEVOLENCE_TALENT} /> to better claim Renew healing, {' '}
       Update <SpellLink spell={TALENTS_PRIEST.RESONANT_WORDS_TALENT} />, {' '}
       Update <SpellLink spell={TALENTS_PRIEST.DIVINE_WORD_TALENT} />, {' '}
-      Update <SpellLink spell={TALENTS_PRIEST.HEALING_CHORUS_TALENT} />, and{' '}
+      Update Healing Chorus, and{' '}
       Update <SpellLink spell={TALENTS_PRIEST.PRAYERFUL_LITANY_TALENT} />
     </>,
     Saeldur,
@@ -25,14 +46,14 @@ export default [
   change(date(2023, 7, 3), 'Update SpellLink usage.', ToppleTheNun),
   change(date(2023, 5, 11), <>Fix crash in Holy Priest T30 module</>, Trevor),
   change(date(2023, 4, 26), <>Restyle Surge of Light and import it for Discipline</>, Hana),
-  change(date(2023, 4, 20), <>Add support for Aberrus, the Shadowed Crucible tier set.</>, Squided),
+  change(date(2023, 4, 20), <>Add support for Aberrus, the Shadowed Crucible tier set.</>, squided),
   change(
     date(2023, 3, 27),
     <>
       Fix bugs in <SpellLink spell={TALENTS_PRIEST.DIVINE_IMAGE_TALENT} /> and{' '}
       <SpellLink spell={TALENTS_PRIEST.ENLIGHTENMENT_TALENT} />t modules.
     </>,
-    Squided,
+    squided,
   ),
   change(
     date(2023, 3, 21),
@@ -41,26 +62,26 @@ export default [
       <SpellLink spell={TALENTS_PRIEST.DIVINE_IMAGE_TALENT} /> module due to combat log issues. Fix{' '}
       <SpellLink spell={TALENTS_PRIEST.DIVINE_WORD_TALENT} /> module.
     </>,
-    Squided,
+    squided,
   ),
-  change(date(2023, 1, 24), <>Updated for patch 10.0.5.</>, Squided),
+  change(date(2023, 1, 24), <>Updated for patch 10.0.5.</>, squided),
   change(
     date(2023, 1, 24),
     <>
       Added support for <SpellLink spell={TALENTS_PRIEST.PRAYERFUL_LITANY_TALENT} />.{' '}
     </>,
-    Squided,
+    squided,
   ),
-  change(date(2022, 12, 18), <>Added initial holy priest guide for 10.0.</>, Squided),
+  change(date(2022, 12, 18), <>Added initial holy priest guide for 10.0.</>, squided),
   change(
     date(2022, 11, 28),
     <>
-      Added support for <SpellLink spell={TALENTS_PRIEST.PONTIFEX_TALENT} />,{' '}
+      Added support for Pontifex,{' '}
       Rapid Recovery,{' '}
       Empowered Renew, and{' '}
       <SpellLink spell={TALENTS_PRIEST.MIRACLE_WORKER_TALENT} />.
     </>,
-    Squided,
+    squided,
   ),
   change(
     date(2022, 11, 26),
@@ -73,11 +94,11 @@ export default [
     date(2022, 11, 10),
     <>
       Added support for
-      <SpellLink spell={TALENTS_PRIEST.SANCTIFIED_PRAYERS_TALENT} />,{' '}
+      Sanctified Prayers,{' '}
       <SpellLink spell={TALENTS_PRIEST.EVERLASTING_LIGHT_TALENT} />, and{' '}
       <SpellLink spell={TALENTS_PRIEST.BURNING_VEHEMENCE_TALENT} />.
     </>,
-    Squided,
+    squided,
   ),
   change(
     date(2022, 11, 7),
@@ -97,7 +118,7 @@ export default [
     date(2022, 10, 22),
     <>
       Updated 'Mana efficiency tab' and added support for{' '}
-      <SpellLink spell={TALENTS.REVITALIZING_PRAYERS_TALENT} />.
+      Revitalizing Prayers.
     </>,
     Litena,
   ),
@@ -105,9 +126,9 @@ export default [
   change(
     date(2022, 10, 12),
     <>
-      Cooldown view now shows <SpellLink spell={TALENTS.HOLY_WORD_SALVATION_TALENT} /> and{' '}
+      Cooldown view now shows Holy Word: Salvation and{' '}
       <SpellLink spell={TALENTS.APOTHEOSIS_TALENT} /> also added support for{' '}
-      <SpellLink spell={TALENTS.HEALING_CHORUS_TALENT} />.
+      Healing Chorus.
     </>,
     Litena,
   ),

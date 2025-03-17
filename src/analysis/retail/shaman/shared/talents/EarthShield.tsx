@@ -1,4 +1,4 @@
-import { formatNumber, formatPercentage } from 'common/format';
+import { formatNumber } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import { TALENTS_SHAMAN } from 'common/TALENTS';
 import { SpellLink } from 'interface';
@@ -8,7 +8,6 @@ import Events, { HealEvent } from 'parser/core/Events';
 import { ThresholdStyle } from 'parser/core/ParseResults';
 import Combatants from 'parser/shared/modules/Combatants';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import ElementalOrbit from './ElementalOrbit';
 import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
@@ -106,22 +105,14 @@ class EarthShield extends Analyzer {
     }
   }
 
-  subStatistic() {
-    return (
-      <StatisticListBoxItem
-        title={<SpellLink spell={TALENTS_SHAMAN.EARTH_SHIELD_TALENT} />}
-        value={`${formatPercentage(
-          this.owner.getPercentageOfTotalHealingDone(this.totalHealing),
-        )} %`}
-      />
-    );
-  }
-
   /** Guide subsection describing the proper usage of Earth Shield */
   get guideSubsection(): JSX.Element {
     const hasElementalOrbit = this.elementalOrbit.active;
     const hasEarthenHarmony = this.selectedCombatant.hasTalent(
       TALENTS_SHAMAN.EARTHEN_HARMONY_TALENT,
+    );
+    const hasReactiveWarding = this.selectedCombatant.hasTalent(
+      TALENTS_SHAMAN.REACTIVE_WARDING_TALENT,
     );
 
     const explanation = (
@@ -140,7 +131,8 @@ class EarthShield extends Analyzer {
               <SpellLink spell={TALENTS_SHAMAN.ELEMENTAL_ORBIT_TALENT} />
             </b>{' '}
             allows you to place <SpellLink spell={TALENTS_SHAMAN.EARTH_SHIELD_TALENT} /> on yourself
-            as well as an ally, and you should aim to maintain high uptime on both
+            as well as an ally, and you should aim to maintain high uptime on both.
+            <br />
             <br />
           </>
         )}
@@ -150,13 +142,18 @@ class EarthShield extends Analyzer {
               <SpellLink spell={TALENTS_SHAMAN.EARTHEN_HARMONY_TALENT} />
             </b>{' '}
             augments <SpellLink spell={TALENTS_SHAMAN.EARTH_SHIELD_TALENT} /> even further by
-            providing damage reduction
-            <br />(
+            providing damage reduction (
+            <b>{formatNumber(this.earthenHarmony.totalDamageReduction)} mitigated</b>){' '}
+          </>
+        )}
+        {hasReactiveWarding && hasEarthenHarmony && <>while </>}
+        {hasReactiveWarding && (
+          <>
             <b>
-              {formatNumber(this.earthenHarmony.totalDamageReduction)} was mitigated from{' '}
-              <SpellLink spell={TALENTS_SHAMAN.EARTHEN_HARMONY_TALENT} />
-            </b>
-            )
+              <SpellLink spell={TALENTS_SHAMAN.REACTIVE_WARDING_TALENT} />
+            </b>{' '}
+            is most efficient when you refresh your shields with as few stacks left as possible
+            <br />
           </>
         )}
       </>

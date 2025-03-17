@@ -1,6 +1,5 @@
 import {
   TwistOfFate,
-  Mindgames,
   ShadowfiendNormalizer,
   TwinsOfTheSunPriestess,
 } from 'analysis/retail/priest/shared';
@@ -46,7 +45,6 @@ import IdolOfCthun from './modules/talents/IdolOfCthun';
 import IdolOfYoggSaron from './modules/talents/IdolOfYoggSaron';
 import IdolOfNzoth from './modules/talents/IdolOfNzoth';
 import IdolOfYshaarj from './modules/talents/IdolOfYshaarj';
-import Manipulation from './modules/talents/Manipulation';
 import InsanityGraph from './modules/guide/InsanityGraph';
 import ShadowyApparitions from './modules/spells/ShadowyApparitions';
 import AuspiciousSpirits from './modules/talents/AuspiciousSpirits';
@@ -61,11 +59,24 @@ import MindMelt from './modules/talents/MindMelt';
 import Mastermind from './modules/talents/Mastermind';
 import DarkAscension from './modules/talents/DarkAscension';
 import Shadowform from './modules/spells/Shadowform';
-
-import Tier29FourSet from './modules/tier/Tier29ShadowPriest4Set';
-import Tier30 from './modules/tier/Tier30ShadowPriest';
-import Tier31FourSet from './modules/tier/Tier31ShadowPriest4Set';
-import Tier31FourSetNormalizer from './modules/tier/Tier31ShadowPriest4SetNormalizer';
+import PerfectedForm from './modules/talents/Archon/PerfectedForm';
+import EnergyCompression from './modules/talents/Archon/EnergyCompression';
+import EmpoweredSurges from './modules/talents/Archon/EmpoweredSurges';
+import ResonantEnergy from './modules/talents/Archon/ResonantEnergy';
+import EnergyCycle from './modules/talents/Archon/EnergyCycle';
+import ConcentratedInfusion from './modules/talents/Archon/Concentrated Infusion';
+import SustainedPotency from './modules/talents/Archon/SustainedPotency';
+import ManifestedPower from './modules/talents/Archon/ManifestedPower';
+import EntropicRift from './modules/talents/Voidweaver/EntropicRift';
+import VoidBlast from './modules/talents/Voidweaver/VoidBlast';
+import InnerQuietus from './modules/talents/Voidweaver/InnerQuietus';
+import Voidheart from './modules/talents/Voidweaver/Voidheart';
+import DevourMatter from './modules/talents/Voidweaver/DevourMatter';
+import VoidEmpowerment from './modules/talents/Voidweaver/VoidEmpowerment';
+import DepthOfShadows from './modules/talents/Voidweaver/DepthOfShadows';
+import ShadowTierTWWS1 from './modules/tier/ShadowTierTWWS1';
+import ShadowTierTWWS2 from './modules/tier/ShadowTierTWWS2';
+import ShadowTierTWWS2Normalizer from './modules/tier/ShadowTierTWWS2Normalizer';
 
 class CombatLogParser extends MainCombatLogParser {
   static specModules = {
@@ -129,21 +140,38 @@ class CombatLogParser extends MainCombatLogParser {
 
     // Class Talents:
     deathAndMadness: DeathAndMadness,
-    manipulation: Manipulation,
-    mindgames: Mindgames,
     twinsOfTheSunPriestess: TwinsOfTheSunPriestess,
     twistOfFate: TwistOfFate,
     vampiricEmbrace: VampiricEmbrace,
 
+    // Hero Talents
+    //Archon
+    perfectedForm: PerfectedForm,
+    energyCompression: EnergyCompression,
+    empoweredSurges: EmpoweredSurges,
+    resonantEnergy: ResonantEnergy,
+    energyCycle: EnergyCycle,
+    concentratedInfusion: ConcentratedInfusion,
+    sustainedPotency: SustainedPotency,
+    manifestedPower: ManifestedPower,
+
+    //Voidweaver
+    entropicRift: EntropicRift,
+    voidBlast: VoidBlast,
+    innerQuietus: InnerQuietus,
+    voidheart: Voidheart,
+    devourMatter: DevourMatter,
+    voidEmpowerment: VoidEmpowerment,
+    depthsOfShadows: DepthOfShadows,
+
     // normalizers:
     channeling: Channeling,
     shadowfiendNormalizer: ShadowfiendNormalizer,
-    tier31FourSetNormalizer: Tier31FourSetNormalizer,
 
     //Tier
-    tier29FourSet: Tier29FourSet,
-    tier30: Tier30,
-    tier31FourSet: Tier31FourSet,
+    shadowTierTWWS1: ShadowTierTWWS1,
+    shadowTierTWWS2: ShadowTierTWWS2,
+    shadowTierTWWS2Normalizer: ShadowTierTWWS2Normalizer,
 
     arcaneTorrent: [ArcaneTorrent, { active: false }] as const,
   };

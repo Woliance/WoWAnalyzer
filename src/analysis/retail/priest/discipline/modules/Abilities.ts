@@ -136,15 +136,6 @@ class Abilities extends CoreAbilities {
         enabled: combatant.hasTalent(TALENTS_PRIEST.POWER_WORD_LIFE_TALENT),
       },
       {
-        spell: TALENTS_PRIEST.MINDGAMES_TALENT.id,
-        category: SPELL_CATEGORY.COOLDOWNS,
-        cooldown: 45,
-        gcd: {
-          base: 1500,
-        },
-        enabled: combatant.hasTalent(TALENTS_PRIEST.MINDGAMES_TALENT),
-      },
-      {
         spell: SPELLS.SHADOWFIEND.id,
         category: SPELL_CATEGORY.COOLDOWNS,
         cooldown: 180,
@@ -185,15 +176,6 @@ class Abilities extends CoreAbilities {
       {
         spell: SPELLS.SHADOW_WORD_PAIN.id,
         category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: !combatant.hasTalent(TALENTS.PURGE_THE_WICKED_TALENT),
-        gcd: {
-          base: 1500,
-        },
-      },
-      {
-        spell: SPELLS.PURGE_THE_WICKED_TALENT.id,
-        category: SPELL_CATEGORY.ROTATIONAL,
-        enabled: combatant.hasTalent(TALENTS.PURGE_THE_WICKED_TALENT),
         gcd: {
           base: 1500,
         },

@@ -3,15 +3,17 @@ import TALENTS from 'common/TALENTS/evoker';
 import EventLinkNormalizer, { EventLink } from 'parser/core/EventLinkNormalizer';
 import { Options } from 'parser/core/Module';
 import {
+  ApplyDebuffEvent,
   CastEvent,
   DamageEvent,
   EventType,
   GetRelatedEvents,
   HasRelatedEvent,
+  RefreshDebuffEvent,
 } from 'parser/core/Events';
 import { encodeEventTargetString } from 'parser/shared/modules/Enemies';
+import { TIERS } from 'game/TIERS';
 
-export const ESSENCE_BURST_CONSUME = 'EssenceBurstConsumption';
 const BURNOUT_CONSUME = 'BurnoutConsumption';
 const SNAPFIRE_CONSUME = 'SnapfireConsumption';
 export const IRIDESCENCE_RED_CONSUME = 'IridescentRedConsumption';
@@ -20,34 +22,19 @@ export const DISINTEGRATE_REMOVE_APPLY = 'DisintegrateRemoveApply';
 export const PYRE_CAST = 'PyreCast';
 export const PYRE_DRAGONRAGE = 'PyreDragonrage';
 export const PYRE_VOLATILITY = 'PyreVolatility';
+export const DISINTEGRATE_CAST_DEBUFF_LINK = 'DisintegrateCastDebuffLink';
+export const DISINTEGRATE_DEBUFF_TICK_LINK = 'DisintegrateDebuffTickLink';
+export const MASS_DISINTEGRATE_CONSUME = 'MassDisintegrateConsume';
+export const MASS_DISINTEGRATE_TICK = 'MassDisintegrateTick';
+export const MASS_DISINTEGRATE_DEBUFF = 'MassDisintegrateDebuff';
+export const JACKPOT_CONSUME = 'JackpotConsume';
 
 export const PYRE_MIN_TRAVEL_TIME = 950;
 export const PYRE_MAX_TRAVEL_TIME = 1_050;
 const CAST_BUFFER_MS = 100;
-const EVENT_LINKS: EventLink[] = [
-  {
-    linkRelation: ESSENCE_BURST_CONSUME,
-    reverseLinkRelation: ESSENCE_BURST_CONSUME,
-    linkingEventId: [TALENTS.RUBY_ESSENCE_BURST_TALENT.id, SPELLS.ESSENCE_BURST_DEV_BUFF.id],
-    linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: SPELLS.DISINTEGRATE.id,
+const DISINTEGRATE_TICK_BUFFER = 4_000; // Haste dependant
 
-    referencedEventType: EventType.Cast,
-    anyTarget: true,
-    forwardBufferMs: CAST_BUFFER_MS,
-    backwardBufferMs: CAST_BUFFER_MS,
-  },
-  {
-    linkRelation: ESSENCE_BURST_CONSUME,
-    reverseLinkRelation: ESSENCE_BURST_CONSUME,
-    linkingEventId: [TALENTS.RUBY_ESSENCE_BURST_TALENT.id, SPELLS.ESSENCE_BURST_DEV_BUFF.id],
-    linkingEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
-    referencedEventId: [SPELLS.PYRE.id, SPELLS.PYRE_DENSE_TALENT.id],
-    referencedEventType: EventType.Cast,
-    anyTarget: true,
-    forwardBufferMs: CAST_BUFFER_MS,
-    backwardBufferMs: CAST_BUFFER_MS,
-  },
+const EVENT_LINKS: EventLink[] = [
   {
     linkRelation: BURNOUT_CONSUME,
     reverseLinkRelation: BURNOUT_CONSUME,
@@ -175,6 +162,88 @@ const EVENT_LINKS: EventLink[] = [
       return pyreHitIsUnique(linkingEvent as CastEvent, referencedEvent as DamageEvent);
     },
   },
+  {
+    linkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
+    reverseLinkRelation: DISINTEGRATE_CAST_DEBUFF_LINK,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    maximumLinks: (C) => (C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT) ? 3 : 1),
+  },
+  {
+    linkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
+    reverseLinkRelation: DISINTEGRATE_DEBUFF_TICK_LINK,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
+    backwardBufferMs: DISINTEGRATE_TICK_BUFFER,
+    maximumLinks: 1,
+  },
+  {
+    linkRelation: MASS_DISINTEGRATE_CONSUME,
+    reverseLinkRelation: MASS_DISINTEGRATE_CONSUME,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.MASS_DISINTEGRATE_BUFF.id,
+    referencedEventType: [EventType.RemoveBuff, EventType.RemoveBuffStack],
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    backwardBufferMs: CAST_BUFFER_MS,
+    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: 1,
+  },
+  {
+    linkRelation: MASS_DISINTEGRATE_TICK,
+    reverseLinkRelation: MASS_DISINTEGRATE_TICK,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Damage,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: true,
+    backwardBufferMs: 4_000,
+    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: 1,
+    additionalCondition(linkingEvent, referencedEvent) {
+      return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
+    },
+  },
+  {
+    linkRelation: MASS_DISINTEGRATE_DEBUFF,
+    reverseLinkRelation: MASS_DISINTEGRATE_DEBUFF,
+    linkingEventId: SPELLS.DISINTEGRATE.id,
+    linkingEventType: EventType.Cast,
+    referencedEventId: SPELLS.DISINTEGRATE.id,
+    referencedEventType: [EventType.ApplyDebuff, EventType.RefreshDebuff],
+    anyTarget: true,
+    forwardBufferMs: CAST_BUFFER_MS,
+    isActive: (C) => C.hasTalent(TALENTS.MASS_DISINTEGRATE_TALENT),
+    maximumLinks: 10,
+    additionalCondition(linkingEvent, referencedEvent) {
+      return encodeEventTargetString(linkingEvent) !== encodeEventTargetString(referencedEvent);
+    },
+  },
+  {
+    linkRelation: JACKPOT_CONSUME,
+    reverseLinkRelation: JACKPOT_CONSUME,
+    linkingEventId: [
+      SPELLS.FIRE_BREATH.id,
+      SPELLS.FIRE_BREATH_FONT.id,
+      SPELLS.ETERNITY_SURGE.id,
+      SPELLS.ETERNITY_SURGE_FONT.id,
+    ],
+    linkingEventType: EventType.EmpowerEnd,
+    referencedEventId: SPELLS.JACKPOT_BUFF.id,
+    referencedEventType: EventType.RemoveBuff,
+    anyTarget: true,
+    backwardBufferMs: CAST_BUFFER_MS,
+    forwardBufferMs: CAST_BUFFER_MS,
+    isActive: (C) => C.has4PieceByTier(TIERS.TWW2),
+    maximumLinks: 1,
+  },
 ];
 
 class CastLinkNormalizer extends EventLinkNormalizer {
@@ -186,10 +255,6 @@ class CastLinkNormalizer extends EventLinkNormalizer {
 // region HELPERS
 export function isFromBurnout(event: CastEvent) {
   return HasRelatedEvent(event, BURNOUT_CONSUME);
-}
-
-export function isFromEssenceBurst(event: CastEvent) {
-  return HasRelatedEvent(event, ESSENCE_BURST_CONSUME);
 }
 
 export function isFromSnapfire(event: CastEvent) {
@@ -233,6 +298,39 @@ function pyreHitIsUnique(
   }
 
   return true;
+}
+
+/** Returns the number of targets that was hit by a Disintegrate cast */
+export function getDisintegrateTargetCount(event: CastEvent) {
+  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK).length;
+}
+
+/** Returns the apply/refresh debuff events that were caused by a Disintegrate cast */
+export function getDisintegrateDebuffEvents(
+  event: CastEvent,
+): (ApplyDebuffEvent | RefreshDebuffEvent)[] {
+  return GetRelatedEvents(event, DISINTEGRATE_CAST_DEBUFF_LINK);
+}
+
+/** Returns the damage events linked to the Disintegrate debuff events */
+export function getDisintegrateDamageEvents(event: CastEvent): DamageEvent[] {
+  const debuffEvents = getDisintegrateDebuffEvents(event);
+  const damageEvents = debuffEvents.map((debuffEvent) =>
+    GetRelatedEvents<DamageEvent>(debuffEvent, DISINTEGRATE_DEBUFF_TICK_LINK),
+  );
+  return damageEvents.flat().sort((a, b) => a.timestamp - b.timestamp);
+}
+
+export function isFromMassDisintegrate(event: CastEvent) {
+  return HasRelatedEvent(event, MASS_DISINTEGRATE_CONSUME);
+}
+
+export function isMassDisintegrateTick(event: DamageEvent) {
+  return HasRelatedEvent(event, MASS_DISINTEGRATE_TICK);
+}
+
+export function isMassDisintegrateDebuff(event: ApplyDebuffEvent | RefreshDebuffEvent) {
+  return HasRelatedEvent(event, MASS_DISINTEGRATE_DEBUFF);
 }
 
 export default CastLinkNormalizer;

@@ -7,6 +7,8 @@ import CooldownGraphSubsection, {
   Cooldown,
 } from 'interface/guide/components/CooldownGraphSubSection';
 import SPELLS from 'common/SPELLS';
+import Cooldowns from 'analysis/retail/shaman/elemental/guide/Cooldowns';
+import DefensiveAndUtility from '../../shared/guide/DefensiveAndUtility';
 
 const PrefaceSection = () => {
   return (
@@ -46,11 +48,15 @@ const CoreSection = (props: GuideProps<typeof CombatLogParser>) => {
   const { info, modules } = props;
   return (
     <Section title="Core Abilities">
-      {(info.combatant.hasTalent(TALENTS_SHAMAN.STORMKEEPER_1_ELEMENTAL_TALENT) ||
-        info.combatant.hasTalent(TALENTS_SHAMAN.STORMKEEPER_2_ELEMENTAL_TALENT)) &&
+      {info.combatant.hasTalent(TALENTS_SHAMAN.STORMKEEPER_TALENT) &&
         modules.stormkeeper.guideSubsection()}
+      {info.combatant.hasTalent(TALENTS.CALL_OF_THE_ANCESTORS_TALENT) &&
+        modules.callOfTheAncestors.guideSubsection()}
+      {modules.maelstromSpenders.guideSubsection()}
       {modules.spenderWindow.active && modules.spenderWindow.guideSubsection()}
-      {modules.electrifiedShocks.active && modules.electrifiedShocks.guideSubsection}
+      {modules.primalStormElemental.active && modules.primalStormElemental.guideSubsection()}
+      {modules.primalFireElemental.active && modules.primalFireElemental.guideSubsection()}
+      {modules.fusionOfElements && modules.fusionOfElements.guideSubsection()}
       <FlameShockSubSection {...props} />
     </Section>
   );
@@ -59,7 +65,7 @@ const CoreSection = (props: GuideProps<typeof CombatLogParser>) => {
 const cooldownTalents: Cooldown[] = [
   {
     spell: SPELLS.STORMKEEPER_BUFF_AND_CAST,
-    isActive: (c) => c.hasTalent(TALENTS.STORMKEEPER_1_ELEMENTAL_TALENT),
+    isActive: (c) => c.hasTalent(TALENTS.STORMKEEPER_TALENT),
   },
   {
     spell: TALENTS.LIQUID_MAGMA_TOTEM_TALENT,
@@ -73,31 +79,6 @@ const cooldownTalents: Cooldown[] = [
     spell: TALENTS.FIRE_ELEMENTAL_TALENT,
     isActive: (c) => c.hasTalent(TALENTS.FIRE_ELEMENTAL_TALENT),
   },
-  { spell: TALENTS.ICEFURY_TALENT, isActive: (c) => c.hasTalent(TALENTS.ICEFURY_TALENT) },
-];
-
-const defensiveTalents: Cooldown[] = [
-  { spell: TALENTS.ASTRAL_SHIFT_TALENT, isActive: (c) => c.hasTalent(TALENTS.ASTRAL_SHIFT_TALENT) },
-  {
-    spell: TALENTS.EARTH_ELEMENTAL_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.EARTH_ELEMENTAL_TALENT),
-  },
-  {
-    spell: TALENTS.NATURES_SWIFTNESS_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.NATURES_SWIFTNESS_TALENT),
-  },
-  {
-    spell: TALENTS.ANCESTRAL_GUIDANCE_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.ANCESTRAL_GUIDANCE_TALENT),
-  },
-  {
-    spell: TALENTS.EARTHEN_WALL_TOTEM_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.EARTHEN_WALL_TOTEM_TALENT),
-  },
-  {
-    spell: TALENTS.SPIRITWALKERS_GRACE_TALENT,
-    isActive: (c) => c.hasTalent(TALENTS.SPIRITWALKERS_GRACE_TALENT),
-  },
 ];
 
 /**
@@ -110,22 +91,11 @@ export default function ElementalGuide(props: GuideProps<typeof CombatLogParser>
       <PrefaceSection />
       <ResourcesSection {...props} />
       <Section title="Cooldown">
+        <Cooldowns {...props} />
         <CooldownGraphSubsection cooldowns={cooldownTalents} />
       </Section>
       <CoreSection {...props} />
-      <Section title="Defensive and utility">
-        <CooldownGraphSubsection
-          cooldowns={defensiveTalents}
-          description={
-            <p>
-              <strong>Defensives and utility</strong> - Defensive and utility talent usage may vary
-              from fight to fight. They may need to be delayed for specific mechanics. In general,
-              any amount of usage is good, but anywhere you could fit in another usage is a
-              theoretical loss.
-            </p>
-          }
-        />
-      </Section>
+      <DefensiveAndUtility />
       <PreparationSection />
     </>
   );

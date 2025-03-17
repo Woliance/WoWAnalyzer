@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/macro';
-import { formatNumber, formatPercentage } from 'common/format';
+import { formatNumber } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import TALENTS from 'common/TALENTS/shaman';
 import { SpellLink } from 'interface';
@@ -16,12 +16,10 @@ import Events, {
 import DonutChart from 'parser/ui/DonutChart';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
-import StatisticListBoxItem from 'parser/ui/StatisticListBoxItem';
 import { STATISTIC_ORDER } from 'parser/ui/StatisticsListBox';
 
 import {
   CHAIN_HEAL_TARGETS,
-  DOWNPOUR_CD_PER_HIT,
   DOWNPOUR_TARGETS,
   HEALING_RAIN_TARGETS,
   RESTORATION_COLORS,
@@ -35,7 +33,6 @@ import {
   getHealingRainEvents,
   getHealingRainHealEventsForTick,
   getOverflowingShoresEvents,
-  isHealingWaveFromPrimordialWave,
   getDownPourEvents,
 } from '../../normalizers/CastLinkNormalizer';
 import {
@@ -99,7 +96,7 @@ class UnleashLife extends Analyzer {
       amount: 0,
       casts: 0,
     },
-    [TALENTS.HEALING_WAVE_TALENT.id]: {
+    [SPELLS.HEALING_WAVE.id]: {
       amount: 0,
       casts: 0,
     },
@@ -115,7 +112,7 @@ class UnleashLife extends Analyzer {
       amount: 0,
       casts: 0,
     },
-    [TALENTS.DOWNPOUR_TALENT.id]: {
+    [SPELLS.DOWNPOUR_ABILITY.id]: {
       amount: 0,
       casts: 0,
     },
@@ -125,8 +122,6 @@ class UnleashLife extends Analyzer {
 
   //healing wave
   healingWaveHealing: number = 0;
-  pwaveActive: boolean;
-  pwaveHealingWaveHealing: number = 0;
 
   //chain heal
   chainHealHealing: number = 0;
@@ -160,18 +155,18 @@ class UnleashLife extends Analyzer {
   constructor(options: Options) {
     super(options);
     this.active = this.selectedCombatant.hasTalent(TALENTS.UNLEASH_LIFE_TALENT);
-    this.pwaveActive = this.selectedCombatant.hasTalent(TALENTS.PRIMORDIAL_WAVE_RESTORATION_TALENT);
+
     this.overflowingShoresActive = this.selectedCombatant.hasTalent(
       TALENTS.OVERFLOWING_SHORES_TALENT,
     );
     this.downpourActive = this.selectedCombatant.hasTalent(TALENTS.DOWNPOUR_TALENT);
     const spellFilter = [
       TALENTS.CHAIN_HEAL_TALENT,
-      TALENTS.HEALING_WAVE_TALENT,
+      SPELLS.HEALING_WAVE,
       SPELLS.HEALING_SURGE,
       TALENTS.WELLSPRING_TALENT,
       TALENTS.HEALING_RAIN_TALENT,
-      TALENTS.DOWNPOUR_TALENT,
+      SPELLS.DOWNPOUR_ABILITY,
     ];
     this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(spellFilter), this._onCast);
     this.addEventListener(
@@ -199,13 +194,14 @@ class UnleashLife extends Analyzer {
       this._onRemoveUL,
     );
     this.goodSpells.push(TALENTS.HEALING_RAIN_TALENT.id);
-    if (this.pwaveActive) {
-      this.goodSpells.push(TALENTS.HEALING_WAVE_TALENT.id);
-    }
+
     if (this.selectedCombatant.hasTalent(TALENTS.HIGH_TIDE_TALENT)) {
       this.goodSpells.push(TALENTS.CHAIN_HEAL_TALENT.id);
     } else {
       this.okSpells.push(TALENTS.CHAIN_HEAL_TALENT.id);
+    }
+    if (this.downpourActive) {
+      this.goodSpells.push(SPELLS.DOWNPOUR_ABILITY.id);
     }
   }
   //necessary because riptide can be spellqued into the spell that actually consumed UL and event linking will match both
@@ -242,7 +238,7 @@ class UnleashLife extends Analyzer {
           event,
         );
       switch (spellId) {
-        case TALENTS.HEALING_WAVE_TALENT.id:
+        case SPELLS.HEALING_WAVE.id:
           this._onHealingWave(event);
           break;
         case TALENTS.HEALING_RAIN_TALENT.id:
@@ -251,7 +247,7 @@ class UnleashLife extends Analyzer {
         case TALENTS.CHAIN_HEAL_TALENT.id:
           this._onChainHeal(event);
           break;
-        case TALENTS.DOWNPOUR_TALENT.id:
+        case SPELLS.DOWNPOUR_ABILITY.id:
           this._onDownpour(event);
           break;
         default:
@@ -358,21 +354,6 @@ class UnleashLife extends Analyzer {
     const spellId = event.ability.guid;
     const ulHealingWaves = getUnleashLifeHealingWaves(event);
     if (ulHealingWaves.length > 0) {
-      //if used in combo with pwave, tally healing separately
-      if (this.pwaveActive) {
-        const pwHealingWaves = ulHealingWaves.filter((event) =>
-          isHealingWaveFromPrimordialWave(event),
-        );
-        this.pwaveHealingWaveHealing += this._tallyHealingIncrease(
-          pwHealingWaves,
-          UNLEASH_LIFE_HEALING_INCREASE,
-        );
-        this.healingWaveHealing += this._tallyHealingIncrease(
-          ulHealingWaves.filter((event) => !isHealingWaveFromPrimordialWave(event)),
-          UNLEASH_LIFE_HEALING_INCREASE,
-        );
-      }
-      //tally subtotal regardless
       this.healingMap[spellId].amount += this._tallyHealingIncrease(
         ulHealingWaves,
         UNLEASH_LIFE_HEALING_INCREASE,
@@ -408,7 +389,7 @@ class UnleashLife extends Analyzer {
         this.missedDownpourHits += UNLEASH_LIFE_EXTRA_TARGETS - filteredhits.length;
       }
       this.extraDownpourHits += filteredhits.length;
-      this.healingMap[TALENTS.DOWNPOUR_TALENT.id].amount += this._tallyHealing(filteredhits);
+      this.healingMap[SPELLS.DOWNPOUR_ABILITY.id].amount += this._tallyHealing(filteredhits);
     }
   }
 
@@ -498,10 +479,6 @@ class UnleashLife extends Analyzer {
     return this.totalBuffedHealing + this.directHealing;
   }
 
-  get additionalDownpourCD() {
-    return this.extraDownpourHits * DOWNPOUR_CD_PER_HIT;
-  }
-
   get buffIcon() {
     return this.wastedBuffs > 0 ? <WarningIcon /> : <CheckmarkIcon />;
   }
@@ -526,10 +503,10 @@ class UnleashLife extends Analyzer {
         color: RESTORATION_COLORS.DOWNPOUR,
         label: <Trans id="shaman.restoration.spell.downpour">Downpour</Trans>,
         spellId: TALENTS.DOWNPOUR_TALENT.id,
-        value: this.healingMap[TALENTS.DOWNPOUR_TALENT.id].amount,
+        value: this.healingMap[SPELLS.DOWNPOUR_ABILITY.id].amount,
         valueTooltip: this._tooltip({
-          spellId: TALENTS.DOWNPOUR_TALENT.id,
-          amount: this.healingMap[TALENTS.DOWNPOUR_TALENT.id].amount,
+          spellId: SPELLS.DOWNPOUR_ABILITY.id,
+          amount: this.healingMap[SPELLS.DOWNPOUR_ABILITY.id].amount,
           active: this.selectedCombatant.hasTalent(TALENTS.DOWNPOUR_TALENT),
           extraHits: this.extraDownpourHits,
         }),
@@ -548,20 +525,13 @@ class UnleashLife extends Analyzer {
       {
         color: RESTORATION_COLORS.HEALING_WAVE,
         label: <Trans id="shaman.restoration.spell.healingWave">Healing Wave</Trans>,
-        spellId: TALENTS.HEALING_WAVE_TALENT.id,
-        value: this.healingMap[TALENTS.HEALING_WAVE_TALENT.id].amount,
-        valueTooltip: this._tooltip(
-          {
-            spellId: TALENTS.HEALING_WAVE_TALENT.id,
-            amount: this.healingWaveHealing,
-            active: true,
-          },
-          {
-            spellId: TALENTS.PRIMORDIAL_WAVE_RESTORATION_TALENT.id,
-            amount: this.pwaveHealingWaveHealing,
-            active: this.pwaveActive,
-          },
-        ),
+        spellId: SPELLS.HEALING_WAVE.id,
+        value: this.healingMap[SPELLS.HEALING_WAVE.id].amount,
+        valueTooltip: this._tooltip({
+          spellId: SPELLS.HEALING_WAVE.id,
+          amount: this.healingWaveHealing,
+          active: true,
+        }),
       },
       {
         color: RESTORATION_COLORS.HEALING_RAIN,
@@ -655,9 +625,7 @@ class UnleashLife extends Analyzer {
         from the potent buff it provides that can be consumed by a number of different abilities.
         This spell is best used in preparation for incoming damage to combo with one of your
         stronger abilities like a <SpellLink spell={TALENTS.HIGH_TIDE_TALENT} />
-        -buffed <SpellLink spell={TALENTS.CHAIN_HEAL_TALENT} />, a{' '}
-        <SpellLink spell={TALENTS.PRIMORDIAL_WAVE_RESTORATION_TALENT} />
-        -buffed <SpellLink spell={TALENTS.HEALING_WAVE_TALENT} />, or{' '}
+        -buffed <SpellLink spell={TALENTS.CHAIN_HEAL_TALENT} />, or{' '}
         <SpellLink spell={TALENTS.HEALING_RAIN_TALENT} />
       </p>
     );
@@ -729,25 +697,6 @@ class UnleashLife extends Analyzer {
       );
     }
     this.castEntries.push({ value, tooltip });
-  }
-
-  subStatistic() {
-    return (
-      <StatisticListBoxItem
-        title={<SpellLink spell={TALENTS.UNLEASH_LIFE_TALENT} />}
-        value={`${formatPercentage(
-          this.owner.getPercentageOfTotalHealingDone(this.totalHealing),
-        )} %`}
-        valueTooltip={
-          <Trans id="shaman.restoration.unleashLife.statistic.tooltip">
-            {formatPercentage(this.owner.getPercentageOfTotalHealingDone(this.directHealing))}% from
-            Unleash Life and{' '}
-            {formatPercentage(this.owner.getPercentageOfTotalHealingDone(this.totalBuffedHealing))}%
-            from the healing buff.
-          </Trans>
-        }
-      />
-    );
   }
 }
 

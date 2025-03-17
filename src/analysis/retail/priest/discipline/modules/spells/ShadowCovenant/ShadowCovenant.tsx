@@ -50,16 +50,26 @@ class ShadowCovenant extends Analyzer {
       this.onHeal,
     );
 
-    this.hasPtw = this.selectedCombatant.hasTalent(TALENTS_PRIEST.PURGE_THE_WICKED_TALENT);
+    this.hasPtw = false;
   }
 
   calculateBonus() {
-    let bonus = this.selectedCombatant.hasTalent(TALENTS_PRIEST.MINDBENDER_DISCIPLINE_TALENT)
-      ? 0.1
-      : 0.25;
+    let bonus;
+
+    // Check for VOIDWRAITH_TALENT first, since it overrides the initial bonus
+    if (this.selectedCombatant.hasTalent(TALENTS_PRIEST.VOIDWRAITH_TALENT)) {
+      bonus = 0.25;
+    } else {
+      // voidwraith is not present
+      bonus = this.selectedCombatant.hasTalent(TALENTS_PRIEST.MINDBENDER_DISCIPLINE_TALENT)
+        ? 0.1
+        : 0.25;
+    }
+
     if (this.selectedCombatant.hasTalent(TALENTS_PRIEST.TWILIGHT_CORRUPTION_TALENT)) {
       bonus += 0.1;
     }
+
     return bonus;
   }
 
@@ -79,7 +89,8 @@ class ShadowCovenant extends Analyzer {
       // Shadow spells only
       damageEvent.ability.type !== MAGIC_SCHOOLS.ids.SHADOW ||
       // no pets here
-      damageEvent.ability.guid === -MAGIC_SCHOOLS.ids.SHADOW
+      damageEvent.ability.guid === -MAGIC_SCHOOLS.ids.SHADOW ||
+      damageEvent.ability.guid === SPELLS.VOID_FLAY_DAMAGE_DISC.id
     ) {
       return;
     }
@@ -144,7 +155,9 @@ class ShadowCovenant extends Analyzer {
             This value includes the healing from bonus atonement healing caused by the damage amped
             and bonus healing to spells which do shadow healing. This number represents the{' '}
             {this.selectedCombatant.hasTalent(TALENTS_PRIEST.MINDBENDER_DISCIPLINE_TALENT)
-              ? 10
+              ? this.selectedCombatant.hasTalent(TALENTS_PRIEST.VOIDWRAITH_TALENT)
+                ? 25
+                : 10
               : 25}
             % amp from <SpellLink spell={TALENTS_PRIEST.SHADOW_COVENANT_TALENT} />, and the extra
             10% amp from <SpellLink spell={TALENTS_PRIEST.TWILIGHT_CORRUPTION_TALENT} /> if it is

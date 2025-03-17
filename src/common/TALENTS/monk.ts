@@ -13,7 +13,7 @@ const talents = {
   AGAINST_ALL_ODDS_TALENT: {
     id: 450986,
     name: 'Against All Odds',
-    icon: 'ability_monk_shuffle',
+    icon: 'achievement_legionpvp6tier1',
     maxRanks: 1,
     entryIds: [125074],
     definitionIds: [{ id: 129906, specId: 269 }],
@@ -25,22 +25,6 @@ const talents = {
     maxRanks: 2,
     entryIds: [124983],
     definitionIds: [{ id: 129821, specId: 270 }],
-  },
-  ANCIENT_CONCORDANCE_TALENT: {
-    id: 388740,
-    name: 'Ancient Concordance',
-    icon: 'spell_animaardenweald_beam',
-    maxRanks: 1,
-    entryIds: [124886],
-    definitionIds: [{ id: 129724, specId: 270 }],
-  },
-  ANCIENT_TEACHINGS_TALENT: {
-    id: 388023,
-    name: 'Ancient Teachings',
-    icon: 'inv_misc_book_07',
-    maxRanks: 1,
-    entryIds: [124882],
-    definitionIds: [{ id: 129720, specId: 270 }],
   },
   ANVIL__STAVE_TALENT: {
     id: 386937,
@@ -173,7 +157,7 @@ const talents = {
   CALL_TO_ARMS_TALENT: {
     id: 397251,
     name: 'Call to Arms',
-    icon: 'ability_bastion_monk',
+    icon: 'inv_ability_monk_jadefirestomp',
     maxRanks: 1,
     entryIds: [124995],
     definitionIds: [{ id: 129833, specId: 268 }],
@@ -183,8 +167,8 @@ const talents = {
     name: 'Calming Coalescence',
     icon: 'ability_monk_healthsphere',
     maxRanks: 1,
-    entryIds: [124873],
-    definitionIds: [{ id: 129711, specId: 270 }],
+    entryIds: [124874],
+    definitionIds: [{ id: 129712, specId: 270 }],
   },
   CALMING_PRESENCE_TALENT: {
     id: 388664,
@@ -251,13 +235,24 @@ const talents = {
     entryIds: [124986],
     definitionIds: [{ id: 129824, specId: 268 }],
   },
-  CHI_BURST_TALENT: {
+  CHI_BURST_SHARED_TALENT: {
     id: 123986,
     name: 'Chi Burst',
     icon: 'spell_arcane_arcanetorrent',
     maxRanks: 1,
+    entryIds: [126501, 126499],
+    definitionIds: [
+      { id: 131327, specId: 268 },
+      { id: 131325, specId: 270 },
+    ],
+  },
+  CHI_BURST_WINDWALKER_TALENT: {
+    id: 460485,
+    name: 'Chi Burst',
+    icon: 'spell_arcane_arcanetorrent',
+    maxRanks: 1,
     entryIds: [124952],
-    definitionIds: [{ id: 129790, specId: 270 }],
+    definitionIds: [{ id: 129790, specId: 269 }],
   },
   CHI_HARMONY_TALENT: {
     id: 448392,
@@ -304,8 +299,12 @@ const talents = {
     name: 'Chi Wave',
     icon: 'ability_monk_chiwave',
     maxRanks: 1,
-    entryIds: [124953],
-    definitionIds: [{ id: 129791, specId: 270 }],
+    entryIds: [126502, 124953, 126500],
+    definitionIds: [
+      { id: 131328, specId: 268 },
+      { id: 129791, specId: 269 },
+      { id: 131326, specId: 270 },
+    ],
   },
   CHRYSALIS_TALENT: {
     id: 202424,
@@ -350,7 +349,7 @@ const talents = {
   COMMUNION_WITH_WIND_TALENT: {
     id: 451576,
     name: 'Communion With Wind',
-    icon: 'ability_skyreach_wind_wall',
+    icon: 'ability_skyreach_four_wind',
     maxRanks: 1,
     entryIds: [124812],
     definitionIds: [{ id: 129650, specId: 269 }],
@@ -454,14 +453,6 @@ const talents = {
     entryIds: [124893],
     definitionIds: [{ id: 129731, specId: 270 }],
   },
-  DARTING_HURRICANE_TALENT: {
-    id: 459839,
-    name: 'Darting Hurricane',
-    icon: 'ability_skyreach_four_wind',
-    maxRanks: 1,
-    entryIds: [126307],
-    definitionIds: [{ id: 131133, specId: 269 }],
-  },
   DEEP_CLARITY_TALENT: {
     id: 446345,
     name: 'Deep Clarity',
@@ -480,7 +471,7 @@ const talents = {
       { id: 129705, specId: 268 },
       { id: 129779, specId: 269 },
     ],
-    energyCost: 20,
+    energyCost: 10,
   },
   DIFFUSE_MAGIC_TALENT: {
     id: 122783,
@@ -554,6 +545,14 @@ const talents = {
     maxRanks: 1,
     entryIds: [124934],
     definitionIds: [{ id: 129772, specId: 270 }],
+  },
+  EMPERORS_FAVOR_TALENT: {
+    id: 471761,
+    name: "Emperor's Favor",
+    icon: 'inv_leather_raidmonkt2_d_01_helm',
+    maxRanks: 1,
+    entryIds: [128344],
+    definitionIds: [{ id: 133150, specId: 270 }],
   },
   ENDLESS_DRAUGHT_TALENT: {
     id: 450892,
@@ -704,7 +703,7 @@ const talents = {
   FLURRY_STRIKES_TALENT: {
     id: 450615,
     name: 'Flurry Strikes',
-    icon: 'ability_monk_pathofmists',
+    icon: 'inv_ability_shadopanmonk_flurrystrikes',
     maxRanks: 1,
     entryIds: [125069],
     definitionIds: [{ id: 129901, specId: 269 }],
@@ -997,7 +996,7 @@ const talents = {
   JADEFIRE_STOMP_TALENT: {
     id: 388193,
     name: 'Jadefire Stomp',
-    icon: 'ability_ardenweald_monk',
+    icon: 'inv_ability_monk_jadefirestomp',
     maxRanks: 1,
     entryIds: [126026, 124881],
     definitionIds: [
@@ -1006,6 +1005,14 @@ const talents = {
     ],
     manaCost: 100000,
   },
+  JADEFIRE_TEACHINGS_TALENT: {
+    id: 467293,
+    name: 'Jadefire Teachings',
+    icon: 'inv_misc_book_07',
+    maxRanks: 1,
+    entryIds: [124882],
+    definitionIds: [{ id: 129720, specId: 270 }],
+  },
   JADE_BOND_TALENT: {
     id: 388031,
     name: 'Jade Bond',
@@ -1013,6 +1020,14 @@ const talents = {
     maxRanks: 1,
     entryIds: [124895],
     definitionIds: [{ id: 129733, specId: 270 }],
+  },
+  JADE_EMPOWERMENT_TALENT: {
+    id: 467316,
+    name: 'Jade Empowerment',
+    icon: 'ability_monk_cracklingjadelightning',
+    maxRanks: 1,
+    entryIds: [128220],
+    definitionIds: [{ id: 133027, specId: 270 }],
   },
   JADE_IGNITION_TALENT: {
     id: 392979,
@@ -1060,8 +1075,8 @@ const talents = {
     name: "Last Emperor's Capacitor",
     icon: 'ability_warrior_unrelentingassault',
     maxRanks: 1,
-    entryIds: [124832],
-    definitionIds: [{ id: 129670, specId: 269 }],
+    entryIds: [128712],
+    definitionIds: [{ id: 133514, specId: 269 }],
   },
   LEAD_FROM_THE_FRONT_TALENT: {
     id: 450985,
@@ -1241,14 +1256,6 @@ const talents = {
     entryIds: [125057],
     definitionIds: [{ id: 129889, specId: 270 }],
   },
-  NOURISHING_CHI_TALENT: {
-    id: 387765,
-    name: 'Nourishing Chi',
-    icon: 'inv_misc_gem_pearl_06',
-    maxRanks: 1,
-    entryIds: [124874],
-    definitionIds: [{ id: 129712, specId: 270 }],
-  },
   ONE_VERSUS_MANY_TALENT: {
     id: 450988,
     name: 'One Versus Many',
@@ -1359,8 +1366,8 @@ const talents = {
     name: 'Power of the Thunder King',
     icon: 'ability_thunderking_thunderstruck',
     maxRanks: 1,
-    entryIds: [126309],
-    definitionIds: [{ id: 131135, specId: 269 }],
+    entryIds: [128711],
+    definitionIds: [{ id: 133513, specId: 269 }],
   },
   PREDICTIVE_TRAINING_TALENT: {
     id: 450992,
@@ -1421,7 +1428,7 @@ const talents = {
   PURIFIED_SPIRIT_TALENT: {
     id: 450867,
     name: 'Purified Spirit',
-    icon: 'ability_argus_soulburst',
+    icon: 'ability_monk_explodingjadeblossom',
     maxRanks: 1,
     entryIds: [125035],
     definitionIds: [{ id: 129871, specId: 270 }],
@@ -1465,6 +1472,14 @@ const talents = {
     maxRanks: 1,
     entryIds: [124870],
     definitionIds: [{ id: 129708, specId: 270 }],
+  },
+  REFRESHMENT_TALENT: {
+    id: 467270,
+    name: 'Refreshment',
+    icon: 'inv_misc_gem_pearl_06',
+    maxRanks: 1,
+    entryIds: [124873],
+    definitionIds: [{ id: 129711, specId: 270 }],
   },
   RENEWING_MIST_TALENT: {
     id: 115151,
@@ -1584,6 +1599,15 @@ const talents = {
     entryIds: [124946],
     definitionIds: [{ id: 129784, specId: 270 }],
   },
+  RUSHING_WIND_KICK_TALENT: {
+    id: 467307,
+    name: 'Rushing Wind Kick',
+    icon: 'ability_monk_ridethewind',
+    maxRanks: 1,
+    entryIds: [128221],
+    definitionIds: [{ id: 133028, specId: 270 }],
+    manaCost: 62500,
+  },
   SALSALABIMS_STRENGTH_TALENT: {
     id: 383697,
     name: "Sal'salabim's Strength",
@@ -1672,6 +1696,14 @@ const talents = {
     maxRanks: 1,
     entryIds: [124814],
     definitionIds: [{ id: 129652, specId: 269 }],
+  },
+  SLICING_WINDS_TALENT: {
+    id: 1217413,
+    name: 'Slicing Winds',
+    icon: 'ability_skyreach_wind_wall',
+    maxRanks: 1,
+    entryIds: [126307],
+    definitionIds: [{ id: 131133, specId: 269 }],
   },
   SONG_OF_CHI_JI_TALENT: {
     id: 198898,
@@ -2031,7 +2063,7 @@ const talents = {
   WEAPONS_OF_ORDER_TALENT: {
     id: 387184,
     name: 'Weapons of Order',
-    icon: 'ability_bastion_monk',
+    icon: 'inv_ability_monk_weaponsoforder',
     maxRanks: 1,
     entryIds: [124996],
     definitionIds: [{ id: 129834, specId: 268 }],

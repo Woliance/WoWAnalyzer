@@ -26,10 +26,9 @@ import MistweaverHealingEfficiencyDetails from './modules/features/MistweaverHea
 import HealingEfficiencyTracker from './modules/features/MistweaverHealingEfficiencyTracker';
 import REMGraph from './modules/features/REMGraph';
 import JadeBond from './modules/spells/JadeBond';
-import NourishingChi from './modules/spells/NourishingChi';
 import RisingSunRevival from './modules/spells/UpliftedSpirits';
 import JadefireStompHealing from './modules/spells/JadefireStompHealing';
-import AncientTeachings from './modules/spells/AncientTeachings';
+import JadefireTeachings from './modules/spells/JadefireTeachings';
 import EnvelopingBreath from './modules/spells/EnvelopingBreath';
 import EnvelopingMists from './modules/spells/EnvelopingMists';
 import ExpelHarm from './modules/spells/ExpelHarm';
@@ -76,7 +75,6 @@ import RisingMistBreakdown from './modules/features/RisingMistBreakdown';
 import CalmingCoalescence from './modules/spells/CalmingCoalescence';
 import LifeCocoon from './modules/spells/LifeCocoon';
 import SecretInfusion from './modules/spells/SecretInfusion';
-import CallToDominance from '../../../../parser/retail/modules/items/dragonflight/CallToDominance';
 import MWSpellManaCost from './modules/core/SpellManaCost';
 import ManaTeaSources from './modules/spells/ManaTeaSources';
 import EnergizingBrew from './modules/spells/EnergizingBrew';
@@ -87,11 +85,23 @@ import CraneStyle from './modules/spells/CraneStyle';
 import ZenPulse from './modules/spells/ZenPulse';
 import T32TierSet from './modules/tier/T32TierSet';
 import PoolOfMists from './modules/spells/PoolOfMists';
+import HeartOfTheJadeSerpent from '../shared/hero/ConduitOfTheCelestials/talents/HeartOfTheJadeSerpent';
+import RestoreBalance from '../shared/hero/ConduitOfTheCelestials/talents/RestoreBalance';
+import ConduitOfTheCelestialsEventLinks from '../shared/hero/ConduitOfTheCelestials/normalizers/ConduitOfTheCelestialsEventLinks';
+import CelestialConduitNormalizer from '../shared/hero/ConduitOfTheCelestials/normalizers/CelestialConduitNormalizer';
+import CelestialConduit from '../shared/hero/ConduitOfTheCelestials/talents/CelestialConduit';
+import StrengthOfTheBlackOx from './modules/heroTalents/StrengthOfTheBlackOx';
+import Coalesence from '../shared/hero/MasterOfHarmony/talents/Coalesence';
+import AspectOfHarmony from './modules/heroTalents/AspectOfHarmony';
+import RushingWindKick from './modules/spells/RushingWindKick';
+import T33TierSet from './modules/tier/T33TierSet';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Normalizer
     castLinkNormalizer: CastLinkNormalizer,
+    celestialConduitNormalizer: CelestialConduitNormalizer,
+    conduitOfTheCelestialsEventLinks: ConduitOfTheCelestialsEventLinks,
     hotApplicationNormalizer: HotApplicationNormalizer,
     hotRemovalNormalizer: HotRemovalNormalizer,
 
@@ -138,7 +148,7 @@ class CombatLogParser extends CoreCombatLogParser {
     vivaciousVivification: VivaciousVivification,
 
     // MW Talents
-    ancientTeachings: AncientTeachings,
+    jadefireTeachings: JadefireTeachings,
     energizingBrew: EnergizingBrew,
     envelopingBreath: EnvelopingBreath,
     envelopingMists: EnvelopingMists,
@@ -155,7 +165,6 @@ class CombatLogParser extends CoreCombatLogParser {
     manaTeaSources: ManaTeaSources,
     mistsOfLife: MistsOfLife,
     mistyPeaks: MistyPeaks,
-    nourishingCh: NourishingChi,
     refreshingJadeWind: RefreshingJadeWind,
     renewingMist: RenewingMist,
     renewingMistDuringManaTea: RenewingMistDuringManaTea,
@@ -183,17 +192,29 @@ class CombatLogParser extends CoreCombatLogParser {
     zenPulse: ZenPulse,
     chiHarmony: ChiHarmony,
     poolOfMists: PoolOfMists,
+    rushingWindKick: RushingWindKick,
 
+    // Hero Talents
+    // Conduit
+    celestialConduit: CelestialConduit,
+    heartOfTheJadeSerpent: HeartOfTheJadeSerpent,
+    restoreBalance: RestoreBalance,
     apl: AplCheck,
+    // Harmony
+    coalesence: Coalesence,
 
     // Borrowed Power
-    callToDominance: CallToDominance,
     t32TierSet: T32TierSet,
+    t33TierSet: T33TierSet,
 
     // Mana Tab
     manaTracker: ManaTracker,
     hpmDetails: MistweaverHealingEfficiencyDetails,
     hpmTracker: HealingEfficiencyTracker,
+
+    // Hero Talents
+    strengthOfTheBlackOx: StrengthOfTheBlackOx,
+    aspectOfHarmony: AspectOfHarmony,
   };
   static guide = Guide;
 }

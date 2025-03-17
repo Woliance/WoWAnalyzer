@@ -43,6 +43,11 @@ export enum EventType {
   EmpowerStart = 'empowerstart',
   EmpowerEnd = 'empowerend',
   Leech = 'leech',
+  // added in 11.0
+  StaggerClear = 'staggerclear',
+  StaggerPrevented = 'staggerprevented',
+  // added in 11.0.7
+  Reflect = 'reflect',
 
   // Fabricated:
   Event = 'event', // everything
@@ -258,6 +263,8 @@ export interface EventMeta {
   inefficientCastReason?: React.ReactNode;
   isEnhancedCast?: boolean;
   enhancedCastReason?: React.ReactNode;
+  isAdditionalCastInfo?: boolean;
+  additionalCastInfo?: React.ReactNode;
 }
 
 export type AbilityEvent<T extends string> = Event<T> & { ability: Ability };
@@ -606,6 +613,7 @@ export interface DamageEvent extends Event<EventType.Damage> {
   overkill?: number;
   blocked?: number; // does this exist?
   subtractsFromSupportedActor?: boolean;
+  supportID?: number;
 }
 
 export interface BuffEvent<T extends string> extends Event<T> {
@@ -788,6 +796,7 @@ export interface InterruptEvent extends Event<EventType.Interrupt> {
 
 export interface DeathEvent extends Event<EventType.Death> {
   killingAbility?: Ability;
+  targetInstance?: number;
   source: CastTarget;
   sourceIsFriendly: boolean;
   targetID: number;
@@ -817,7 +826,7 @@ export interface ResurrectEvent extends Event<EventType.Resurrect> {
 export interface SummonEvent extends Event<EventType.Summon> {
   sourceID: number;
   sourceIsFriendly: boolean;
-  target: PetInfo;
+  target?: PetInfo;
   targetID: number;
   targetInstance: number;
   targetIsFriendly: boolean;
@@ -1038,6 +1047,12 @@ export interface Item {
   effectID?: number;
   permanentEnchant?: number;
   temporaryEnchant?: number;
+  /**
+   * An enchant that provides an activatable ability.
+   *
+   * Only seen it used on Cata Engineering "enchants".
+   */
+  onUseEnchant?: number;
   gems?: Gem[];
   setID?: number;
 
@@ -1087,10 +1102,7 @@ export interface Soulbind {
 export interface TalentEntry {
   id: number;
   nodeID: number;
-  spellID: number;
   rank: number;
-  icon?: string;
-  spellType?: number;
 }
 
 export interface CombatantInfoEvent extends Event<EventType.CombatantInfo> {

@@ -9,11 +9,24 @@ import { RoundedPanel } from 'interface/guide/components/GuideDivs';
 import { explanationAndDataSubsection } from 'interface/guide/components/ExplanationRow';
 import { mergeTimePeriods } from 'parser/core/mergeTimePeriods';
 import { Highlight } from 'interface/Highlight';
+import { TALENTS_DRUID } from 'common/TALENTS';
 
 const SOLAR_ECLIPSE_COLOR = '#bb9922';
 const LUNAR_ECLIPSE_COLOR = '#1111cc';
 const CA_COLOR = '#11bbbb';
 
+/**
+ * **Eclipse**
+ * Spec Talent
+ *
+ * Casting 2 Starfire empowers Wrath for 15 sec. Casting 2 Wrath empowers Starfire for 15 sec.
+ *
+ * Eclipse (Solar)
+ * Nature spells deal 15% additional damage and Wrath damage is increased by 40%.
+ *
+ * Eclipse (Lunar)
+ * Arcane spells deal 15% additional damage and the damage Starfire deals to nearby enemies is increased by 30%.
+ */
 export default class Eclipse extends Analyzer {
   mapWithColor(uptimes: TrackedBuffEvent[], customColor: string): Uptime[] {
     return uptimes.map((uptime) => ({
@@ -81,6 +94,15 @@ export default class Eclipse extends Analyzer {
           stacked targets with <SpellLink spell={SPELLS.STARFIRE} />, and best to enter{' '}
           <SpellLink spell={SPELLS.ECLIPSE_SOLAR} /> otherwise.
         </p>
+        {this.selectedCombatant.hasTalent(TALENTS_DRUID.LUNAR_CALLING_TALENT) && (
+          <p>
+            <i>
+              However, because you took <SpellLink spell={TALENTS_DRUID.LUNAR_CALLING_TALENT} />,
+              you can only enter Lunar Eclipse. When Eclipse drops you must use Wrath to reenter
+              Eclipse.
+            </i>
+          </p>
+        )}
       </>
     );
 

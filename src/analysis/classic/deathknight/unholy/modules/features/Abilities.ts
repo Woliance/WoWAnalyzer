@@ -7,53 +7,58 @@ class Abilities extends CoreAbilities {
     return [
       // Rotational
       {
-        spell: [SPELLS.DEATH_COIL_DK.id, ...SPELLS.DEATH_COIL_DK.lowRanks],
+        spell: SPELLS.DEATH_COIL_DK.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.ICY_TOUCH.id, ...SPELLS.ICY_TOUCH.lowRanks],
+        spell: SPELLS.ICY_TOUCH.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.PLAGUE_STRIKE.id, ...SPELLS.PLAGUE_STRIKE.lowRanks],
+        spell: SPELLS.PLAGUE_STRIKE.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.BLOOD_STRIKE.id, ...SPELLS.BLOOD_STRIKE.lowRanks],
+        spell: SPELLS.BLOOD_STRIKE.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.GHOUL_FRENZY.id],
+        spell: SPELLS.FESTERING_STRIKE.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.SCOURGE_STRIKE.id, ...SPELLS.SCOURGE_STRIKE.lowRanks],
+        spell: [SPELLS.DARK_TRANSFORMATION.id],
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: { base: 1500 },
+      },
+      {
+        spell: SPELLS.SCOURGE_STRIKE.id,
+        category: SPELL_CATEGORY.ROTATIONAL,
+        gcd: { base: 1500 },
+      },
+      {
+        spell: SPELLS.OUTBREAK.id,
         category: SPELL_CATEGORY.ROTATIONAL,
         gcd: { base: 1500 },
       },
       // Rotational AOE
       {
-        spell: [SPELLS.DEATH_AND_DECAY.id, ...SPELLS.DEATH_AND_DECAY.lowRanks],
+        spell: SPELLS.DEATH_AND_DECAY.id,
         category: SPELL_CATEGORY.ROTATIONAL_AOE,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.BLOOD_BOIL.id, ...SPELLS.BLOOD_BOIL.lowRanks],
+        spell: SPELLS.BLOOD_BOIL.id,
         category: SPELL_CATEGORY.ROTATIONAL_AOE,
         gcd: { base: 1500 },
       },
       {
         spell: [SPELLS.PESTILENCE.id],
-        category: SPELL_CATEGORY.ROTATIONAL_AOE,
-        gcd: { base: 1500 },
-      },
-      {
-        spell: [SPELLS.CORPSE_EXPLOSION.id, ...SPELLS.CORPSE_EXPLOSION.lowRanks],
         category: SPELL_CATEGORY.ROTATIONAL_AOE,
         gcd: { base: 1500 },
       },
@@ -77,10 +82,17 @@ class Abilities extends CoreAbilities {
         cooldown: 300,
       },
       {
-        spell: [SPELLS.ARMY_OF_THE_DEAD.id],
+        spell: SPELLS.ARMY_OF_THE_DEAD.id,
         category: SPELL_CATEGORY.COOLDOWNS,
         gcd: { base: 1500 },
         cooldown: 600,
+      },
+      {
+        spell: SPELLS.UNHOLY_FRENZY.id,
+        category: SPELL_CATEGORY.COOLDOWNS,
+        gcd: null,
+        cooldown: 180,
+        buffSpellIds: [SPELLS.UNHOLY_FRENZY.id],
       },
       // Defensive
       {
@@ -137,12 +149,12 @@ class Abilities extends CoreAbilities {
         gcd: null,
       },
       {
-        spell: [SPELLS.DEATH_STRIKE.id, ...SPELLS.DEATH_STRIKE.lowRanks],
+        spell: SPELLS.DEATH_STRIKE.id,
         category: SPELL_CATEGORY.UTILITY,
         gcd: { base: 1500 },
       },
       {
-        spell: [SPELLS.HORN_OF_WINTER.id, ...SPELLS.HORN_OF_WINTER.lowRanks],
+        spell: SPELLS.HORN_OF_WINTER.id,
         category: SPELL_CATEGORY.UTILITY,
         gcd: { base: 1500 },
       },

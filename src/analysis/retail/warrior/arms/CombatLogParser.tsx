@@ -1,6 +1,14 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import Channeling from 'parser/shared/normalizers/Channeling';
-
+import WindfuryLinkNormalizer from 'parser/shared/normalizers/WindfuryLinkNormalizer';
+import RageGraph from '../shared/modules/core/RageGraph';
+import RageTracker from '../shared/modules/core/RageTracker';
+import RageCountDebugger from '../shared/modules/debuggers/RageCountDebugger';
+import GenerateRageEventsNormalizer from '../shared/modules/normalizers/rage/GenerateRageEventsNormalizer';
+import RageAttributeNormalizer from '../shared/modules/normalizers/rage/RageAttributeNormalizer';
+import ResourceChangeNormalizer from '../shared/modules/normalizers/rage/ResourceChangeNormalizer';
+import ChampionsMight from '../shared/modules/talents/ChampionsMight';
+import ChampionsSpear from '../shared/modules/talents/ChampionsSpear';
 import Abilities from './modules/Abilities';
 import Checklist from './modules/checklist/Module';
 import AplCheck from './modules/core/AplCheck';
@@ -18,8 +26,7 @@ import SweepingStrikes from './modules/core/SweepingStrikes';
 import TacticianProc from './modules/core/TacticianProc';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
-import RageDetail from './modules/features/RageDetails';
-import RageTracker from './modules/features/RageTracker';
+import RageDetails from './modules/features/RageDetails';
 import SpellUsable from './modules/features/SpellUsable';
 import AngerManagement from './modules/talents/AngerManagement';
 import Avatar from './modules/talents/Avatar';
@@ -34,21 +41,36 @@ import SuddenDeath from './modules/talents/SuddenDeath';
 import Warbreaker from './modules/talents/Warbreaker';
 import WarMachine from './modules/talents/WarMachine';
 import BattlelordBuff from './normalizers/BattlelordBuff';
+import ExecuteLinkNormalizer from './normalizers/ExecuteLinkNormalizer';
+import FinishingBlowsResourceChange from './normalizers/FinishingBlowsResourceChange';
+import ImprovedExecuteNormalizer from './normalizers/ImprovedExecuteNormalizer';
 import OverpowerStacks from './normalizers/OverpowerStacks';
 import SpellReflection from '../shared/modules/talents/SpellReflection';
 import FatalMark from './modules/talents/FatalMark';
-import ExecuteNormalizer from './normalizers/ExecuteNormalizer';
 import SkullsplitterDotNormalizer from './normalizers/SkullsplitterExpiredDots';
 import BlademastersTormentNormalizer from './modules/talents/BlademastersTorment';
+import UnhingedMortalStrikeNormalizer from './normalizers/UnhingedMortalStrikeNormalizer';
+import Demolish from './modules/talents/Demolish';
+import DemolishNormalizer from './normalizers/DemolishNormalizer';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Normalizers
+    windfuryNormalizer: WindfuryLinkNormalizer,
+
+    finishingBlowsResourceChange: FinishingBlowsResourceChange,
+    desourceChangeNormalizer: ResourceChangeNormalizer,
+    generateRageEventsNormalizer: GenerateRageEventsNormalizer,
+    rageAttributeNormalizer: RageAttributeNormalizer,
+
     overpowerStacks: OverpowerStacks,
     battlelordBuff: BattlelordBuff,
-    executeNormalizer: ExecuteNormalizer,
+    executeLinkNormalizer: ExecuteLinkNormalizer,
+    improvedExecuteNormalizer: ImprovedExecuteNormalizer,
     skullsplitterDotNormalizer: SkullsplitterDotNormalizer,
     blademaastersTormetNormalizer: BlademastersTormentNormalizer,
+    unhingedMortalStrikeNormalizer: UnhingedMortalStrikeNormalizer,
+    demolishNormalizer: DemolishNormalizer,
 
     // WarriorCore
     abilities: Abilities,
@@ -62,7 +84,8 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Resource
     rageTracker: RageTracker,
-    rageDetail: RageDetail,
+    rageGraph: RageGraph,
+    rageDetails: RageDetails,
 
     // Core
     tacticianProc: TacticianProc,
@@ -97,6 +120,12 @@ class CombatLogParser extends CoreCombatLogParser {
     avatar: Avatar,
     spellReflection: SpellReflection,
     fatalMark: FatalMark,
+    ChampionsSpear: ChampionsSpear,
+    ChampionsMight: ChampionsMight,
+    demolish: Demolish,
+
+    // Debuggers
+    rageCountDebugger: RageCountDebugger,
 
     apl: AplCheck,
   };

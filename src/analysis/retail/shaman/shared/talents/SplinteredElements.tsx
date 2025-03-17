@@ -10,10 +10,9 @@ import Events, {
   RemoveBuffEvent,
 } from 'parser/core/Events';
 import { SPLINTERED_ELEMENTS_LINK } from 'analysis/retail/shaman/shared/constants';
-import { LIGHTNING_BOLT_LINK } from 'analysis/retail/shaman/enhancement/modules/normalizers/EventLinkNormalizer';
 import Haste from 'parser/shared/modules/Haste';
 
-export default class SplinteredElements extends Analyzer {
+export default abstract class SplinteredElements extends Analyzer {
   static dependencies = {
     haste: Haste,
   };
@@ -23,6 +22,11 @@ export default class SplinteredElements extends Analyzer {
 
   constructor(options: Options) {
     super(options);
+
+    this.active = this.isActive();
+    if (!this.active) {
+      return;
+    }
 
     this.addEventListener(
       Events.applybuff.by(SELECTED_PLAYER).spell(SPELLS.SPLINTERED_ELEMENTS_BUFF),
@@ -37,7 +41,6 @@ export default class SplinteredElements extends Analyzer {
 
   onApplySplinteredElements(event: ApplyBuffEvent) {
     this.hasteGain = 0;
-    // primordial wave boosted cast
     const castEvent = GetRelatedEvent<CastEvent>(event, SPLINTERED_ELEMENTS_LINK);
     if (!castEvent) {
       console.error(
@@ -47,7 +50,7 @@ export default class SplinteredElements extends Analyzer {
     }
     const damageEvents = GetRelatedEvents(
       castEvent,
-      LIGHTNING_BOLT_LINK,
+      SPLINTERED_ELEMENTS_LINK,
       (e) => e.type === EventType.Damage,
     );
     if (!damageEvents) {
@@ -56,9 +59,20 @@ export default class SplinteredElements extends Analyzer {
       );
       return;
     }
-    this.hasteGain = (20 + Math.max(damageEvents.length - 2, 0) * 4) / 100;
+    this.hasteGain = this.getGainedHaste(damageEvents.length);
     this.haste._applyHasteGain(event, this.hasteGain);
   }
+
+  /**
+   * @param hitCount number of linked damage events related to the cast of primordial wave
+   * @returns the haste percentage gained by the splintered elements buff
+   */
+  abstract getGainedHaste(hitCount: number): number;
+
+  /**
+   * Returns whether the module should be active or not
+   */
+  abstract isActive(): boolean;
 
   onRemoveSplinteredElements(event: RemoveBuffEvent) {
     this.haste._applyHasteLoss(event, this.hasteGain);

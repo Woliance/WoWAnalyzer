@@ -5,8 +5,8 @@ import DebugAnnotations, {
 } from 'parser/core/modules/DebugAnnotations';
 import Tooltip from './Tooltip';
 import styled from '@emotion/styled';
-import { AnyEvent, HasAbility, HasSource, HasTarget } from 'parser/core/Events';
-import { useMemo, useState } from 'react';
+import { Ability, AnyEvent, HasAbility, HasSource, HasTarget } from 'parser/core/Events';
+import { useMemo, useState, useCallback } from 'react';
 import { useCombatLogParser } from './report/CombatLogParserContext';
 import { formatDuration } from 'common/format';
 import SpellLink from './SpellLink';
@@ -40,14 +40,19 @@ function ModuleDebugAnnotations({ module, annotations }: ModuleAnnotations) {
       <DotContainer>
         {intoRows(annotations, parser.fight.start_time).map((row, index) => (
           <Row key={index}>
-            {row.map((props, index) => (
-              <AnnotationDot
-                {...props}
-                key={index}
-                onClick={() => setSelected((current) => (current === props ? null : props))}
-                selected={selected === props}
-              />
-            ))}
+            <RowTimestamp>
+              {`${index}:00`} - {row.length} events
+            </RowTimestamp>
+            <RowContent>
+              {row.map((props, index) => (
+                <AnnotationDot
+                  {...props}
+                  key={index}
+                  onClick={() => setSelected((current) => (current === props ? null : props))}
+                  selected={selected === props}
+                />
+              ))}
+            </RowContent>
           </Row>
         ))}
       </DotContainer>
@@ -88,7 +93,7 @@ function EventDetails({
               <>
                 <dt>Ability</dt>
                 <dd>
-                  <SpellLink spell={event.ability.guid} />
+                  <SpellLink spell={event.ability.guid} /> <CopySpellData ability={event.ability} />
                 </dd>
               </>
             )}
@@ -192,15 +197,33 @@ const Dot = styled('div')<{ color: string; selected?: boolean }>`
 
 const DotContainer = styled.div`
   display: flex;
+  margin-top: 0.5em;
   flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
 
-  font-size: 75%;
+  gap: 4px;
+
+  // Originally 70% (10.5px)
+  // This aims to have a pixel perfect value so Dots doesn't get deformed
+  // by navigator rendering interpolations.
+  font-size: 71.4288%;
 `;
 
 const Row = styled.div`
+  border-left: 1px solid #eee;
+  padding-left: 4px;
+`;
+
+const RowTimestamp = styled.div`
+  display: inline-block;
+  margin-bottom: 2px;
+`;
+
+const RowContent = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+
   gap: 2px;
 `;
 
@@ -217,4 +240,37 @@ function intoRows<T extends { event: AnyEvent }>(data: Array<T>, startTime: numb
   }
 
   return rows;
+}
+
+const CopyTextLink = styled.button`
+  appearance: none;
+  border: none;
+  background: none;
+  font-size: small;
+  color: #777;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+function CopySpellData({ ability }: { ability: Ability }) {
+  const copy = useCallback(async () => {
+    try {
+      const data = JSON.stringify({
+        id: ability.guid,
+        name: ability.name,
+        icon: ability.abilityIcon,
+      });
+      const key = ability.name
+        .toUpperCase()
+        .replaceAll(/\W+/g, '_')
+        .replaceAll(/[^a-zA-Z_]/g, '');
+      const text = `${key}: ${data},`;
+      await navigator.clipboard.writeText(text);
+    } catch {
+      alert('Unable to copy data to clipboard');
+    }
+  }, [ability]);
+  return <CopyTextLink onClick={copy}>(copy definition)</CopyTextLink>;
 }

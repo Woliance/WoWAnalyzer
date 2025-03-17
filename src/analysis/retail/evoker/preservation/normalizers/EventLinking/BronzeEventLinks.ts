@@ -23,6 +23,9 @@ import {
   TIME_OF_NEED_DURATION,
   REVERSION,
   MAX_REVERSION_DURATION,
+  STASIS_FILLING,
+  FULL_STASIS_DURATION,
+  TEMPORAL_COMPRESSION_REVERSION,
 } from './constants';
 
 export const BRONZE_EVENT_LINKS: EventLink[] = [
@@ -74,6 +77,16 @@ export const BRONZE_EVENT_LINKS: EventLink[] = [
         !HasRelatedEvent(referencedEvent, STASIS)
       );
     },
+  },
+  {
+    linkRelation: STASIS_FILLING,
+    reverseLinkRelation: STASIS_FILLING,
+    linkingEventId: SPELLS.STASIS_BUFF.id,
+    linkingEventType: EventType.RemoveBuff,
+    referencedEventId: TALENTS_EVOKER.STASIS_TALENT.id,
+    referencedEventType: [EventType.RemoveBuffStack, EventType.RemoveBuff],
+    backwardBufferMs: FULL_STASIS_DURATION,
+    anyTarget: true,
   },
   {
     linkRelation: STASIS_FOR_RAMP,
@@ -132,5 +145,14 @@ export const BRONZE_EVENT_LINKS: EventLink[] = [
         !HasRelatedEvent(linkingEvent, REVERSION)
       );
     },
+  },
+  {
+    linkRelation: TEMPORAL_COMPRESSION_REVERSION,
+    reverseLinkRelation: TEMPORAL_COMPRESSION_REVERSION,
+    linkingEventId: SPELLS.TEMPORAL_COMPRESSION_BUFF.id,
+    linkingEventType: [EventType.ApplyBuff, EventType.ApplyBuffStack],
+    referencedEventId: TALENTS_EVOKER.REVERSION_TALENT.id,
+    referencedEventType: EventType.Cast,
+    anyTarget: true,
   },
 ];

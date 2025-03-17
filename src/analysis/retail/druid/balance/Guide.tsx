@@ -10,14 +10,13 @@ import { PerformanceStrong } from 'analysis/retail/priest/shadow/modules/guide/E
 import PerformancePercentage from 'analysis/retail/demonhunter/shared/guide/PerformancePercentage';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import {
-  ASP_SCALE_FACTOR,
   GOOD_ASP_WASTED,
   OK_ASP_WASTED,
   PERFECT_ASP_WASTED,
 } from 'analysis/retail/druid/balance/modules/core/astralpower/AstralPowerTracker';
 import PreparationSection from 'interface/guide/components/Preparation/PreparationSection';
 import ActiveTimeGraph from 'parser/ui/ActiveTimeGraph';
-import { cdSpell } from 'analysis/retail/druid/balance/constants';
+import { ASTRAL_POWER_SCALE_FACTOR, cdSpell } from 'analysis/retail/druid/balance/constants';
 
 export default function Guide({ modules, events, info }: GuideProps<typeof CombatLogParser>) {
   return (
@@ -71,7 +70,7 @@ function CoreSection({ modules, events, info }: GuideProps<typeof CombatLogParse
           Your primary resource is <ResourceLink id={RESOURCE_TYPES.ASTRAL_POWER.id} />. Most of
           your spells generate Astral Power, which can be spent to cast{' '}
           <SpellLink spell={TALENTS_DRUID.STARSURGE_SHARED_TALENT} /> or{' '}
-          <SpellLink spell={TALENTS_DRUID.STARFALL_TALENT} />. Avoid capping Astral Power!
+          <SpellLink spell={SPELLS.STARFALL_CAST} />. Avoid capping Astral Power!
         </p>
         The chart below shows your Astral Power over the course of the encounter. You wasted{' '}
         <PerformancePercentage
@@ -80,7 +79,7 @@ function CoreSection({ modules, events, info }: GuideProps<typeof CombatLogParse
           goodPercentage={GOOD_ASP_WASTED}
           okPercentage={OK_ASP_WASTED}
           percentage={modules.astralPowerTracker.percentWasted}
-          flatAmount={modules.astralPowerTracker.wasted * ASP_SCALE_FACTOR}
+          flatAmount={modules.astralPowerTracker.wasted * ASTRAL_POWER_SCALE_FACTOR}
         />{' '}
         of your <ResourceLink id={RESOURCE_TYPES.ASTRAL_POWER.id} />.
       </SubSection>
@@ -172,13 +171,6 @@ function CooldownGraphSubsection({ modules, events, info }: GuideProps<typeof Co
       {info.combatant.hasTalent(TALENTS_DRUID.WARRIOR_OF_ELUNE_TALENT) && (
         <CastEfficiencyBar
           spellId={TALENTS_DRUID.WARRIOR_OF_ELUNE_TALENT.id}
-          gapHighlightMode={GapHighlight.FullCooldown}
-          useThresholds
-        />
-      )}
-      {info.combatant.hasTalent(TALENTS_DRUID.ASTRAL_COMMUNION_TALENT) && (
-        <CastEfficiencyBar
-          spellId={TALENTS_DRUID.ASTRAL_COMMUNION_TALENT.id}
           gapHighlightMode={GapHighlight.FullCooldown}
           useThresholds
         />

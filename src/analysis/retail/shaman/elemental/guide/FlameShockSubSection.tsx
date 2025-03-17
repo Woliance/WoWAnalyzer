@@ -30,13 +30,11 @@ export const FlameShockSubSection = ({
         always be up on your target at low target counts so every{' '}
         <SpellLink spell={TALENTS_SHAMAN.LAVA_BURST_TALENT} /> critically hits.
       </p>
-      {info.combatant.hasTalent(TALENTS_SHAMAN.LAVA_SURGE_TALENT) && (
-        <p>
-          Every <SpellLink spell={SPELLS.FLAME_SHOCK} /> damage tick has a chance to proc{' '}
-          <SpellLink spell={TALENTS_SHAMAN.LAVA_SURGE_TALENT} />, which reset the cooldown on{' '}
-          <SpellLink spell={TALENTS_SHAMAN.LAVA_BURST_TALENT} /> and make your next cast instant.
-        </p>
-      )}
+      <p>
+        Every <SpellLink spell={SPELLS.FLAME_SHOCK} /> damage tick has a chance to proc{' '}
+        <SpellLink spell={SPELLS.LAVA_SURGE} />, which reset the cooldown on{' '}
+        <SpellLink spell={TALENTS_SHAMAN.LAVA_BURST_TALENT} /> and make your next cast instant.
+      </p>
     </>
   );
 
@@ -50,7 +48,7 @@ export const FlameShockSubSection = ({
           {formatPercentage((modules.flameShock as FlameShock).uptime)}% <small>uptime</small>
           <div
             style={{
-              height: '40px' /* UptimeStackBar floats and doesn't have an intrinsic height */,
+              height: '24px' /* UptimeStackBar floats and doesn't have an intrinsic height */,
             }}
           >
             {
@@ -61,7 +59,7 @@ export const FlameShockSubSection = ({
             <UptimeStackBar
               start={info.fightStart}
               end={info.fightEnd}
-              barColor="#ac1f39"
+              barColor="#4ec04e"
               timeTooltip
               {...modules.flameShock.getDebuffStackHistory()}
             />
